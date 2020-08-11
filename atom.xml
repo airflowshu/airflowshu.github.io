@@ -1,41 +1,43 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
-  <title>Hexo</title>
+  <title>面朝大海</title>
   
   
   <link href="/atom.xml" rel="self"/>
   
-  <link href="http://yoursite.com/"/>
-  <updated>2020-06-13T12:50:18.970Z</updated>
-  <id>http://yoursite.com/</id>
+  <link href="http://wangts.site/"/>
+  <updated>2020-08-11T06:56:42.971Z</updated>
+  <id>http://wangts.site/</id>
   
   <author>
-    <name>John Doe</name>
+    <name>Wangts</name>
     
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
   
   <entry>
-    <title>Hello World</title>
-    <link href="http://yoursite.com/2020/06/13/hello-world/"/>
-    <id>http://yoursite.com/2020/06/13/hello-world/</id>
-    <published>2020-06-13T12:50:18.970Z</published>
-    <updated>2020-06-13T12:50:18.970Z</updated>
+    <title>记录一次线上Redis宕机</title>
+    <link href="http://wangts.site/2020/08/11/%E8%AE%B0%E5%BD%95%E4%B8%80%E6%AC%A1%E7%BA%BF%E4%B8%8ARedis%E5%AE%95%E6%9C%BA/"/>
+    <id>http://wangts.site/2020/08/11/%E8%AE%B0%E5%BD%95%E4%B8%80%E6%AC%A1%E7%BA%BF%E4%B8%8ARedis%E5%AE%95%E6%9C%BA/</id>
+    <published>2020-08-11T05:15:16.000Z</published>
+    <updated>2020-08-11T06:56:42.971Z</updated>
     
     <summary type="html">
     
-      
-      
-        
-        
-          &lt;p&gt;Welcome to &lt;a href=&quot;https://hexo.io/&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;Hexo&lt;/a&gt;! This is your very first post. Check &lt;a
-        
-      
+      &lt;h2 id=&quot;SlowLog说明&quot;&gt;&lt;a href=&quot;#SlowLog说明&quot; class=&quot;headerlink&quot; title=&quot;SlowLog说明&quot;&gt;&lt;/a&gt;SlowLog说明&lt;/h2&gt;&lt;p&gt;Slowlog 是 Redis用来记录查询执行时间的日志系统。注意，这个查询执行时间指的是不包括像客户端响应(talking)、发送回复等IO操作，而单单是执行一个查询命令所耗费的时间。&lt;/p&gt;
     
     </summary>
     
     
+      <category term="数据库" scheme="http://wangts.site/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/"/>
+    
+      <category term="Redis" scheme="http://wangts.site/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/Redis/"/>
+    
+      <category term="线上" scheme="http://wangts.site/categories/%E7%BA%BF%E4%B8%8A/"/>
+    
+    
+      <category term="线上生产记录" scheme="http://wangts.site/tags/%E7%BA%BF%E4%B8%8A%E7%94%9F%E4%BA%A7%E8%AE%B0%E5%BD%95/"/>
     
   </entry>
   

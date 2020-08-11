@@ -1,21 +1,94 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Hello World</title>
-    <url>/2020/06/13/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
+    <title>记录一次线上Redis宕机</title>
+    <url>/2020/08/11/%E8%AE%B0%E5%BD%95%E4%B8%80%E6%AC%A1%E7%BA%BF%E4%B8%8ARedis%E5%AE%95%E6%9C%BA/</url>
+    <content><![CDATA[<h2 id="SlowLog说明"><a href="#SlowLog说明" class="headerlink" title="SlowLog说明"></a>SlowLog说明</h2><p>Slowlog 是 Redis用来记录查询执行时间的日志系统。注意，这个查询执行时间指的是不包括像客户端响应(talking)、发送回复等IO操作，而单单是执行一个查询命令所耗费的时间。</p>
+<a id="more"></a>
+<img src="/2020/08/11/%E8%AE%B0%E5%BD%95%E4%B8%80%E6%AC%A1%E7%BA%BF%E4%B8%8ARedis%E5%AE%95%E6%9C%BA/image.png" class="" title="This is an example image">
 
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+<p>slowlog 保存在内存里面，读写速度非常快，因此我们可以放心地使用它，不必担心因为开启slowlog 而损害 Redis 的速度。</p>
+<p>slowlog 有两个重要的配置，我们先通过 CONFIG GET slowlog-* 命令来查看现有的配置。<br><code>127.0.0.1:6379&gt; CONFIG GET slowlog-*</code></p>
+<ol>
+<li><p>“slowlog-log-slower-than”</p>
+</li>
+<li><p>“100”</p>
+</li>
+<li><p>“slowlog-max-len”</p>
+</li>
+<li><p>“1024”</p>
+</li>
+</ol>
+<p>slowlog-log-slower-than代表慢查询的阈值，单位为：微秒。当执行查询命令消耗时间大于配置的阈值时，会将该条命令记录到慢查询日志。<br>当slowlog-log-slower-than=0时，记录所有命令。slowlog-log-slower-than&lt;0时，不记录任何命令。<br>slowlog-log-slower-than 的默认值为 10000 （10毫秒，1秒 =1,000毫秒 = 1,000,000微秒）。</p>
+<p>slowlog-max-len<br>代表慢查询日志最大条数。它是一个队列形式的存储结构，先进先出的队列，即当慢查询日志达到最大条数后，会销毁最早记录的日志条目。slowlog-max-len的默认值为 128，保存在内存内，所以重启 redis 会清空慢查询日志。</p>
+<p>配置 <em>slowlog-log-slower-than</em> 和 <em>slowlog-max-len</em> 的命令非常简单，如下：</p>
+<ol>
+<li><p><code>CONFIG SET slowlog-log-slower-than 100</code></p>
+</li>
+<li><p><code>CONFIG SET slowlog-max-len 1024</code></p>
+</li>
+</ol>
+<p>使用 SLOWLOG LEN 命令，查询当前的慢查询日志记录数。</p>
+<pre><code>1. 127.0.0.1:6379&gt; `SLOWLOG LEN`
 
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+2. (integer) 2019</code></pre><p>当我们只需要查询前几个慢查询记录时，可以使用 SLOWLOG GET <code>[n]</code> 命令。</p>
+<pre><code>127.0.0.1:6379&gt; SLOWLOG GET 3
 
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+1)  
+     1. (integer) 14         # 唯一性(unique)的日志标识符
 
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+     2. (integer) 1522808219 # 被记录命令的执行时间点，以 UNIX 时间戳格式表示
+
+     3. (integer) 16         # 查询执行时间，以微秒为单位
+
+     4. &quot;keys&quot;               # 执行的命令，以数组的形式排列
+
+     5. &quot;*&quot;                  # 这里完整的命令是 &quot;keys *&quot;
+
+2)  
+     (integer) 13
+
+     (integer) 1522808215
+
+     (integer) 7
+
+      a. &quot;set&quot;
+
+      b. &quot;name&quot;
+
+      c. &quot;baicai&quot;
+
+
+3)  
+      1) (integer) 12
+
+      2) (integer) 1522808198
+
+      3) (integer) 101
+
+4)   
+      1) &quot;set&quot;
+
+      2) &quot;age&quot;
+
+      3) &quot;25&quot;</code></pre><p>SLOWLOG GET <code>[n]</code> 若不加 n ,则获取全部慢查询记录。</p>
+<p>清空慢查询日志使用 SLOWLOG RESET。注意，slowlog-log-slower-than<br>不要设置过大，设置过大有可能一条记录也不会记录。</p>
+<h2 id="线上实际业务需求："><a href="#线上实际业务需求：" class="headerlink" title="线上实际业务需求："></a>线上实际业务需求：</h2><p>车辆从龙门架经过，被抓拍机抓拍车牌数据后推送到分流LED屏幕，根据车道管理配置规则分配分流车道号，该数据存放在redis缓存中，时效5分钟；<br>到安检车道安检后删除缓存中对应车辆数据。</p>
+<img src="/2020/08/11/%E8%AE%B0%E5%BD%95%E4%B8%80%E6%AC%A1%E7%BA%BF%E4%B8%8ARedis%E5%AE%95%E6%9C%BA/image_3.png" class="" title="This is an example image">
+
+<p>该业务在车流量大时频繁读写相关key，因此在存放消息队列的方法内在进行redis读写操作时，为防止消息队列的数据隔离安全问题加了ReenTranLock，<br>但内部方法又涉及了其他的业务操作，并且其他的业务操作也去读取了redis相关数据；所以尽可能不涉及再操作其他的业务流程操作和方法体内再读写其他相关redis业务数据；<br>否则，可能造成redis慢查询；而在锁未释放时，线上其他业务也访问redis，redis连接池慢查询未释放资源，导致最终服务宕机不可用。</p>
+<img src="/2020/08/11/%E8%AE%B0%E5%BD%95%E4%B8%80%E6%AC%A1%E7%BA%BF%E4%B8%8ARedis%E5%AE%95%E6%9C%BA/image_1.png" class="" title="This is an example image">
+
+
+<p><strong>解决方式：</strong><br>    将相关业务代码抽离出来；ReidsQunene只进行单一的读写业务操作；</p>
 ]]></content>
+      <categories>
+        <category>数据库</category>
+        <category>Redis</category>
+        <category>线上</category>
+      </categories>
+      <tags>
+        <tag>线上生产记录</tag>
+      </tags>
   </entry>
 </search>

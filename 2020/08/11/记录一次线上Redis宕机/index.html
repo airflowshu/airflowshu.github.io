@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 
 
-<html lang="en">
+<html lang="zh-CN">
 
 
 <head>
   <meta charset="utf-8" />
     
+  <meta name="description" content="coder zone" />
+  
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
   <title>
-    Hello World |  Hexo
+    记录一次线上Redis宕机 |  面朝大海
   </title>
   <meta name="generator" content="hexo-theme-ayer">
   
@@ -33,7 +35,7 @@
 
   
 
-<link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+<link rel="alternate" href="/atom.xml" title="面朝大海" type="application/atom+xml">
 </head>
 
 </html>
@@ -45,7 +47,7 @@
     <main class="content on">
       <section class="outer">
   <article
-  id="post-hello-world"
+  id="post-记录一次线上Redis宕机"
   class="article article-type-post"
   itemscope
   itemprop="blogPost"
@@ -56,22 +58,26 @@
     <header class="article-header">
        
 <h1 class="article-title sea-center" style="border-left:0" itemprop="name">
-  Hello World
+  记录一次线上Redis宕机
 </h1>
  
 
     </header>
      
     <div class="article-meta">
-      <a href="/2020/06/13/hello-world/" class="article-date">
-  <time datetime="2020-06-13T12:50:18.970Z" itemprop="datePublished">2020-06-13</time>
-</a>   
+      <a href="/2020/08/11/%E8%AE%B0%E5%BD%95%E4%B8%80%E6%AC%A1%E7%BA%BF%E4%B8%8ARedis%E5%AE%95%E6%9C%BA/" class="article-date">
+  <time datetime="2020-08-11T05:15:16.000Z" itemprop="datePublished">2020-08-11</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a> / <a class="article-category-link" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/Redis/">Redis</a> / <a class="article-category-link" href="/categories/%E7%BA%BF%E4%B8%8A/">线上</a>
+  </div>
+  
 <div class="word_count">
     <span class="post-time">
         <span class="post-meta-item-icon">
             <i class="ri-quill-pen-line"></i>
-            <span class="post-meta-item-text"> Word count:</span>
-            <span class="post-count">73</span>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">918</span>
         </span>
     </span>
 
@@ -79,8 +85,8 @@
         &nbsp; | &nbsp;
         <span class="post-meta-item-icon">
             <i class="ri-book-open-line"></i>
-            <span class="post-meta-item-text"> Reading time≈</span>
-            <span class="post-count">1 min</span>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">3 分钟</span>
         </span>
     </span>
 </div>
@@ -95,24 +101,89 @@
   
     <div class="article-entry" itemprop="articleBody">
        
-  <p>Welcome to <a href="https://hexo.io/" target="_blank" rel="noopener">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/" target="_blank" rel="noopener">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html" target="_blank" rel="noopener">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues" target="_blank" rel="noopener">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">"My New Post"</span></span><br></pre></td></tr></table></figure>
+  <h2 id="SlowLog说明"><a href="#SlowLog说明" class="headerlink" title="SlowLog说明"></a>SlowLog说明</h2><p>Slowlog 是 Redis用来记录查询执行时间的日志系统。注意，这个查询执行时间指的是不包括像客户端响应(talking)、发送回复等IO操作，而单单是执行一个查询命令所耗费的时间。</p>
+<a id="more"></a>
+<img src="/2020/08/11/%E8%AE%B0%E5%BD%95%E4%B8%80%E6%AC%A1%E7%BA%BF%E4%B8%8ARedis%E5%AE%95%E6%9C%BA/image.png" class="" title="This is an example image">
 
-<p>More info: <a href="https://hexo.io/docs/writing.html" target="_blank" rel="noopener">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
+<p>slowlog 保存在内存里面，读写速度非常快，因此我们可以放心地使用它，不必担心因为开启slowlog 而损害 Redis 的速度。</p>
+<p>slowlog 有两个重要的配置，我们先通过 CONFIG GET slowlog-* 命令来查看现有的配置。<br><code>127.0.0.1:6379&gt; CONFIG GET slowlog-*</code></p>
+<ol>
+<li><p>“slowlog-log-slower-than”</p>
+</li>
+<li><p>“100”</p>
+</li>
+<li><p>“slowlog-max-len”</p>
+</li>
+<li><p>“1024”</p>
+</li>
+</ol>
+<p>slowlog-log-slower-than代表慢查询的阈值，单位为：微秒。当执行查询命令消耗时间大于配置的阈值时，会将该条命令记录到慢查询日志。<br>当slowlog-log-slower-than=0时，记录所有命令。slowlog-log-slower-than&lt;0时，不记录任何命令。<br>slowlog-log-slower-than 的默认值为 10000 （10毫秒，1秒 =1,000毫秒 = 1,000,000微秒）。</p>
+<p>slowlog-max-len<br>代表慢查询日志最大条数。它是一个队列形式的存储结构，先进先出的队列，即当慢查询日志达到最大条数后，会销毁最早记录的日志条目。slowlog-max-len的默认值为 128，保存在内存内，所以重启 redis 会清空慢查询日志。</p>
+<p>配置 <em>slowlog-log-slower-than</em> 和 <em>slowlog-max-len</em> 的命令非常简单，如下：</p>
+<ol>
+<li><p><code>CONFIG SET slowlog-log-slower-than 100</code></p>
+</li>
+<li><p><code>CONFIG SET slowlog-max-len 1024</code></p>
+</li>
+</ol>
+<p>使用 SLOWLOG LEN 命令，查询当前的慢查询日志记录数。</p>
+<pre><code>1. 127.0.0.1:6379&gt; `SLOWLOG LEN`
 
-<p>More info: <a href="https://hexo.io/docs/server.html" target="_blank" rel="noopener">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
+2. (integer) 2019</code></pre><p>当我们只需要查询前几个慢查询记录时，可以使用 SLOWLOG GET <code>[n]</code> 命令。</p>
+<pre><code>127.0.0.1:6379&gt; SLOWLOG GET 3
 
-<p>More info: <a href="https://hexo.io/docs/generating.html" target="_blank" rel="noopener">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
+1)  
+     1. (integer) 14         # 唯一性(unique)的日志标识符
 
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html" target="_blank" rel="noopener">Deployment</a></p>
+     2. (integer) 1522808219 # 被记录命令的执行时间点，以 UNIX 时间戳格式表示
+
+     3. (integer) 16         # 查询执行时间，以微秒为单位
+
+     4. &quot;keys&quot;               # 执行的命令，以数组的形式排列
+
+     5. &quot;*&quot;                  # 这里完整的命令是 &quot;keys *&quot;
+
+2)  
+     (integer) 13
+
+     (integer) 1522808215
+
+     (integer) 7
+
+      a. &quot;set&quot;
+
+      b. &quot;name&quot;
+
+      c. &quot;baicai&quot;
+
+
+3)  
+      1) (integer) 12
+
+      2) (integer) 1522808198
+
+      3) (integer) 101
+
+4)   
+      1) &quot;set&quot;
+
+      2) &quot;age&quot;
+
+      3) &quot;25&quot;</code></pre><p>SLOWLOG GET <code>[n]</code> 若不加 n ,则获取全部慢查询记录。</p>
+<p>清空慢查询日志使用 SLOWLOG RESET。注意，slowlog-log-slower-than<br>不要设置过大，设置过大有可能一条记录也不会记录。</p>
+<h2 id="线上实际业务需求："><a href="#线上实际业务需求：" class="headerlink" title="线上实际业务需求："></a>线上实际业务需求：</h2><p>车辆从龙门架经过，被抓拍机抓拍车牌数据后推送到分流LED屏幕，根据车道管理配置规则分配分流车道号，该数据存放在redis缓存中，时效5分钟；<br>到安检车道安检后删除缓存中对应车辆数据。</p>
+<img src="/2020/08/11/%E8%AE%B0%E5%BD%95%E4%B8%80%E6%AC%A1%E7%BA%BF%E4%B8%8ARedis%E5%AE%95%E6%9C%BA/image_3.png" class="" title="This is an example image">
+
+<p>该业务在车流量大时频繁读写相关key，因此在存放消息队列的方法内在进行redis读写操作时，为防止消息队列的数据隔离安全问题加了ReenTranLock，<br>但内部方法又涉及了其他的业务操作，并且其他的业务操作也去读取了redis相关数据；所以尽可能不涉及再操作其他的业务流程操作和方法体内再读写其他相关redis业务数据；<br>否则，可能造成redis慢查询；而在锁未释放时，线上其他业务也访问redis，redis连接池慢查询未释放资源，导致最终服务宕机不可用。</p>
+<img src="/2020/08/11/%E8%AE%B0%E5%BD%95%E4%B8%80%E6%AC%A1%E7%BA%BF%E4%B8%8ARedis%E5%AE%95%E6%9C%BA/image_1.png" class="" title="This is an example image">
+
+
+<p><strong>解决方式：</strong><br>    将相关业务代码抽离出来；ReidsQunene只进行单一的读写业务操作；</p>
  
       <!-- reward -->
       
       <div id="reward-btn">
-        Donate
+        打赏
       </div>
       
     </div>
@@ -124,8 +195,8 @@
       <ul class="post-copyright">
         <li>
           <i class="ri-copyright-line"></i>
-          <strong>Copyright： </strong>
-          Copyright is owned by the author. For commercial reprints, please contact the author for authorization. For non-commercial reprints, please indicate the source.
+          <strong>版权声明： </strong>
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
         </li>
       </ul>
     </div>
@@ -174,11 +245,13 @@
     <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
     <p>扫一扫，分享到微信</p>
     <div class="wx-qrcode">
-      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://yoursite.com/2020/06/13/hello-world/" alt="微信分享二维码">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://wangts.site/2020/08/11/%E8%AE%B0%E5%BD%95%E4%B8%80%E6%AC%A1%E7%BA%BF%E4%B8%8ARedis%E5%AE%95%E6%9C%BA/" alt="微信分享二维码">
     </div>
 </div>
 
 <div id="share-mask"></div>  
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E7%BA%BF%E4%B8%8A%E7%94%9F%E4%BA%A7%E8%AE%B0%E5%BD%95/" rel="tag">线上生产记录</a></li></ul>
+
     </footer>
   </div>
 
@@ -193,8 +266,8 @@
 <script>
   new Valine({
     el: "#vcomments",
-    app_id: "",
-    app_key: "",
+    app_id: "qJP4WkbLmBpuiutXgUcIRS5S-gzGzoHsz",
+    app_key: "UKnAIhmbhJsuXH69KOGBGBRn",
     path: window.location.pathname,
     avatar: "monsterid",
     placeholder: "给我的文章加点评论吧~",
@@ -241,8 +314,8 @@
     <ul>
       <li>
         Copyrights &copy;
-        2015-2020
-        <i class="ri-heart-fill heart_icon"></i> John Doe
+        2019-2020
+        <i class="ri-heart-fill heart_icon"></i> Wangts
       </li>
     </ul>
     <ul>
@@ -250,9 +323,9 @@
         
         
         
-        Powered by <a href="https://hexo.io" target="_blank">Hexo</a>
+        由 <a href="https://hexo.io" target="_blank">Hexo</a> 强力驱动
         <span class="division">|</span>
-        Theme - <a href="https://github.com/Shen-Yu/hexo-theme-ayer" target="_blank">Ayer</a>
+        主题 - <a href="https://github.com/Shen-Yu/hexo-theme-ayer" target="_blank">Ayer</a>
         
       </li>
     </ul>
@@ -261,9 +334,9 @@
         
         
         <span>
-  <span><i class="ri-user-3-fill"></i>Visitors:<span id="busuanzi_value_site_uv"></span></s>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></s>
   <span class="division">|</span>
-  <span><i class="ri-eye-fill"></i>Views:<span id="busuanzi_value_page_pv"></span></span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
 </span>
         
       </li>
@@ -275,7 +348,7 @@
       <li>
         <!-- cnzz统计 -->
         
-        <script type="text/javascript" src='https://s9.cnzz.com/z_stat.php?id=1278069914&amp;web_id=1278069914'></script>
+        <script type="text/javascript" src='https://v1.cnzz.com/z_stat.php?id=1278578668&amp;web_id=1278578668'></script>
         
       </li>
     </ul>
@@ -297,7 +370,7 @@
 <nav class="navbar">
   
   <div class="logo">
-    <a href="/"><img src="/images/ayer-side.svg" alt="Hexo"></a>
+    <a href="/"><img src="/images/ayer-side.svg" alt="面朝大海"></a>
   </div>
   
   <ul class="nav nav-main">
@@ -319,14 +392,6 @@
     </li>
     
     <li class="nav-item">
-      <a class="nav-item-link" href="/tags/%E6%97%85%E8%A1%8C/">旅行</a>
-    </li>
-    
-    <li class="nav-item">
-      <a class="nav-item-link" href="http://shenyu-vip.lofter.com" target="_blank" rel="noopener">摄影</a>
-    </li>
-    
-    <li class="nav-item">
       <a class="nav-item-link" href="/2020/about">关于我</a>
     </li>
     
@@ -336,7 +401,7 @@
   <ul class="nav">
     <li class="nav-item">
       
-      <a class="nav-item-link nav-item-search"  title="Search">
+      <a class="nav-item-link nav-item-search"  title="搜索">
         <i class="ri-search-line"></i>
       </a>
       
@@ -366,17 +431,12 @@
 <!-- #reward -->
 <div id="reward">
   <span class="close"><i class="ri-close-line"></i></span>
-  <p class="reward-p"><i class="ri-cup-line"></i>请我喝杯咖啡吧~</p>
+  <p class="reward-p"><i class="ri-cup-line"></i>加个好友呗~</p>
   <div class="reward-box">
     
-    <div class="reward-item">
-      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/alipay.jpg">
-      <span class="reward-type">支付宝</span>
-    </div>
-    
     
     <div class="reward-item">
-      <img class="reward-img" src="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/img/wechat.jpg">
+      <img class="reward-img" src="/images/wechat.jpg">
       <span class="reward-type">微信</span>
     </div>
     
@@ -398,7 +458,7 @@
       typeSpeed: 200,
       loop: true,
       backSpeed: 100,
-      showCursor: true
+      showCursor: false
     });
   } catch (err) {
     console.log(err)
@@ -551,6 +611,10 @@
 
 <!-- ClickLove -->
 
+
+<script src="/js/clickLove.js"></script>
+
+
 <!-- ClickBoom1 -->
 
 <!-- ClickBoom2 -->
@@ -619,6 +683,23 @@
 <!-- CanvasBackground -->
 
 
+    
+    <div id="music">
+    
+    
+    
+    <iframe frameborder="no" border="1" marginwidth="0" marginheight="0" width="200" height="52"
+        src="//music.163.com/outchain/player?type=2&id=22707008&auto=1&height=32"></iframe>
+</div>
+
+<style>
+    #music {
+        position: fixed;
+        right: 15px;
+        bottom: 0;
+        z-index: 998;
+    }
+</style>
     
   </div>
 </body>
