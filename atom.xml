@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://wangts.site/"/>
-  <updated>2020-08-17T09:15:35.810Z</updated>
+  <updated>2020-08-18T08:35:18.935Z</updated>
   <id>http://wangts.site/</id>
   
   <author>
@@ -15,6 +15,31 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Redis笔记</title>
+    <link href="http://wangts.site/2020/08/18/Redis%E7%AC%94%E8%AE%B0/"/>
+    <id>http://wangts.site/2020/08/18/Redis%E7%AC%94%E8%AE%B0/</id>
+    <published>2020-08-18T01:58:51.000Z</published>
+    <updated>2020-08-18T08:35:18.935Z</updated>
+    
+    <summary type="html">
+    
+      &lt;h2 id=&quot;1-Redis简介&quot;&gt;&lt;a href=&quot;#1-Redis简介&quot; class=&quot;headerlink&quot; title=&quot;1.Redis简介&quot;&gt;&lt;/a&gt;1.Redis简介&lt;/h2&gt;&lt;p&gt;Redis 是我们在互联网应用中使用最广泛的一个 NoSQL 数据库，基于 C 开发的键值对存储数据库，&lt;br&gt;Redis 这个名字是 Remote Dictionary Service 字母缩写。&lt;br&gt;很多人想到 Redis，就想到缓存。但实际上 Redis 除了缓存之外，还有许多更加丰富的使用场景。比如&lt;br&gt;分布式锁，限流。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="数据库" scheme="http://wangts.site/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/"/>
+    
+      <category term="Redis" scheme="http://wangts.site/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/Redis/"/>
+    
+      <category term="开发手册" scheme="http://wangts.site/categories/%E5%BC%80%E5%8F%91%E6%89%8B%E5%86%8C/"/>
+    
+    
+      <category term="开发手册" scheme="http://wangts.site/tags/%E5%BC%80%E5%8F%91%E6%89%8B%E5%86%8C/"/>
+    
+  </entry>
   
   <entry>
     <title>Mysql表字段设计原则</title>

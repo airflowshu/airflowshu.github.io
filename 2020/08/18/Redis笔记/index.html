@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+
+
+<html lang="zh-CN">
+
+
+<head>
+  <meta charset="utf-8" />
+    
+  <meta name="description" content="coder zone" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
+  <title>
+    Redis笔记 |  coder zone
+  </title>
+  <meta name="generator" content="hexo-theme-ayer">
+  
+  <link rel="shortcut icon" href="/favicon.ico" />
+  
+  
+<link rel="stylesheet" href="/dist/main.css">
+
+  
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Shen-Yu/cdn/css/remixicon.min.css">
+
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+  
+  
+<script src="https://cdn.jsdelivr.net/npm/pace-js@1.0.2/pace.min.js"></script>
+
+  
+  
+
+  
+
+<link rel="alternate" href="/atom.xml" title="面朝大海" type="application/atom+xml">
+</head>
+
+</html>
+
+<body>
+  <div id="app">
+    
+      
+      <canvas width="1777" height="841"
+        style="position: fixed; left: 0px; top: 0px; z-index: 99999; pointer-events: none;"></canvas>
+      
+    <main class="content on">
+      <section class="outer">
+  <article
+  id="post-Redis笔记"
+  class="article article-type-post"
+  itemscope
+  itemprop="blogPost"
+  data-scroll-reveal
+>
+  <div class="article-inner">
+    
+    <header class="article-header">
+       
+<h1 class="article-title sea-center" style="border-left:0" itemprop="name">
+  Redis笔记
+</h1>
+ 
+
+    </header>
+     
+    <div class="article-meta">
+      <a href="/2020/08/18/Redis%E7%AC%94%E8%AE%B0/" class="article-date">
+  <time datetime="2020-08-18T01:58:51.000Z" itemprop="datePublished">2020-08-18</time>
+</a> 
+  <div class="article-category">
+    <a class="article-category-link" href="/categories/%E5%BC%80%E5%8F%91%E6%89%8B%E5%86%8C/">开发手册</a> / <a class="article-category-link" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/">数据库</a> / <a class="article-category-link" href="/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/Redis/">Redis</a>
+  </div>
+  
+<div class="word_count">
+    <span class="post-time">
+        <span class="post-meta-item-icon">
+            <i class="ri-quill-pen-line"></i>
+            <span class="post-meta-item-text"> 字数统计:</span>
+            <span class="post-count">4.6k</span>
+        </span>
+    </span>
+
+    <span class="post-time">
+        &nbsp; | &nbsp;
+        <span class="post-meta-item-icon">
+            <i class="ri-book-open-line"></i>
+            <span class="post-meta-item-text"> 阅读时长≈</span>
+            <span class="post-count">18 分钟</span>
+        </span>
+    </span>
+</div>
+ 
+    </div>
+      
+    <div class="tocbot"></div>
+
+
+
+
+  
+    <div class="article-entry" itemprop="articleBody">
+       
+  <h2 id="1-Redis简介"><a href="#1-Redis简介" class="headerlink" title="1.Redis简介"></a>1.Redis简介</h2><p>Redis 是我们在互联网应用中使用最广泛的一个 NoSQL 数据库，基于 C 开发的键值对存储数据库，<br>Redis 这个名字是 Remote Dictionary Service 字母缩写。<br>很多人想到 Redis，就想到缓存。但实际上 Redis 除了缓存之外，还有许多更加丰富的使用场景。比如<br>分布式锁，限流。</p>
+<a id="more"></a>
+
+<p>特点:</p>
+<ul>
+<li>支持数据持久化</li>
+<li>支持多种不同的数据结构类型之间的映射</li>
+<li>支持主从模式的数据备份</li>
+<li>自带了发布订阅系统</li>
+<li>定时器、计数器</li>
+</ul>
+<h2 id="2-Redis安装"><a href="#2-Redis安装" class="headerlink" title="2.Redis安装"></a>2.Redis安装</h2><p>四种方式获取一个 Redis：</p>
+<ul>
+<li><ol>
+<li>直接编译安装（推荐使用）</li>
+</ol>
+</li>
+<li><ol start="2">
+<li>使用 Docker</li>
+</ol>
+</li>
+<li><ol start="3">
+<li>也可以直接安装</li>
+</ol>
+</li>
+<li><ol start="4">
+<li>还有一个在线体验的方式，通过在线体验，可以直接使用 Redis 的功能 <a href="http://try.redis.io" target="_blank" rel="noopener">http://try.redis.io</a></li>
+</ol>
+</li>
+</ul>
+<h3 id="2-1-直接安装编译"><a href="#2-1-直接安装编译" class="headerlink" title="2.1 直接安装编译"></a>2.1 直接安装编译</h3><p>准备gcc环境</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install gcc-c++</span><br></pre></td></tr></table></figure>
+<p>下载并安装redis</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">wget http:&#x2F;&#x2F;download.redis.io&#x2F;releases&#x2F;redis-5.0.7.tar.gz</span><br><span class="line">tar -zxvf redis-5.0.7.tar.gz</span><br><span class="line">cd redis-5.0.7&#x2F;</span><br><span class="line">make</span><br><span class="line">make install</span><br></pre></td></tr></table></figure>
+<p>安装完成，启动redis</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis-server redis.conf</span><br></pre></td></tr></table></figure>
+<img src="/2020/08/18/Redis%E7%AC%94%E8%AE%B0/1.png" class="" title="This is an example image">
+
+<h3 id="2-2-通过-Docker-安装"><a href="#2-2-通过-Docker-安装" class="headerlink" title="2.2 通过 Docker 安装"></a>2.2 通过 Docker 安装</h3><p>Docker 安装好之后，启动 Docker ，直接运行安装命令即可：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker run --name wangts-redis -d -p 6379:6379 redis --requirepass 123</span><br></pre></td></tr></table></figure>
+<p>Docker 上的 Redis 启动成功之后，可以从宿主机上连接（前提是宿主机上存在 redis-cli）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis-cli -a 123</span><br></pre></td></tr></table></figure>
+<p>如果宿主机上没有安装 Redis，那么也可以进入到 Docker 容器种去操作 Redis:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker exec -it wangts-redis redis-cli -a 123</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-3-直接安装"><a href="#2-3-直接安装" class="headerlink" title="2.3 直接安装"></a>2.3 直接安装</h3><p>CENTOS:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">yum install redis</span><br></pre></td></tr></table></figure>
+
+<p>Ubuntu:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">apt-get install redis</span><br></pre></td></tr></table></figure>
+
+<p>Mac:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">brew install redis</span><br></pre></td></tr></table></figure>
+
+<h2 id="3-Redis-五种基本数据类型"><a href="#3-Redis-五种基本数据类型" class="headerlink" title="3. Redis 五种基本数据类型"></a>3. Redis 五种基本数据类型</h2><h3 id="3-1-Reids启动"><a href="#3-1-Reids启动" class="headerlink" title="3.1 Reids启动"></a>3.1 Reids启动</h3><p>首先，修改 redis.conf 配置文件：</p>
+<img src="/2020/08/18/Redis%E7%AC%94%E8%AE%B0/2.png" class="" title="This is an example image">
+<p>配置完成后，保存退出，再次通过 redis-server redis.conf 命令启动 Redis，此时，就是在后台启<br>动了。</p>
+<img src="/2020/08/18/Redis%E7%AC%94%E8%AE%B0/3.png" class="" title="This is an example image">
+<h3 id="3-2-String"><a href="#3-2-String" class="headerlink" title="3.2 String"></a>3.2 String</h3><p>String 是 Redis 里边最最简单的一种数据结构。在 Redis 中，所以的 key 都是字符串，但是，不同的<br>key 对应的 value 则具备不同的数据结构，我们所说的五种不同的数据类型，主要是指 value 的数据类<br>型不同。</p>
+<p>Redis 中的字符串是动态字符串，内部是可以修改的，像 Java 中的 StringBuffer，它采用分配冗余空间<br>的方式来减少内存的频繁分配。在 Redis 内部结构中，一般实际分配的内存会大于需要的内存，当字符<br>串小于 1M 的时候，扩容都是在现有的空间基础上加倍，扩容每次扩 1M 空间，最大 512M。</p>
+<ul>
+<li>set<br>set 就是给一个 key 赋值的。</li>
+<li>append<br>使用 append 命令时，如果 key 已经存在，则直接在对应的 value 后追加值，否则就创建新的键值对。</li>
+<li>decr<br>可以实现对 value 的减 1 操作（前提是 value 是一个数字），如果 value 不是数字，会报错，如果<br>value 不存在，则会给一个默认的值为 0，在默认值的基础上减一。</li>
+<li>decrby<br>和 decr 类似，但是可以自己设置步长，该命令第二个参数就是步长。</li>
+<li>get<br>get 用来获取一个 key 的 value。</li>
+<li>getrange<br>getrange 可以用来返回 key 对应的 value 的子串，这有点类似于 Java 里边的 substring。这个命令第<br>二个和第三个参数就是截取的起始和终止位置，其中，-1 表示最后一个字符串，-2 表示倒数第二个字符<br>串，以此类推…</li>
+<li>getset<br>获取并更新某一个 key。</li>
+<li>incr<br>给某一个 key 的 value 自增。</li>
+<li>incrby<br>给某一个 key 的 value 自增，同时还可以设置步长。</li>
+<li>incrbyfloat<br>和 incrby 类似，但是自增的步长可以设置为浮点数。</li>
+<li>mget 和 mset<br>批量获取和批量存储</li>
+<li>ttl<br>查看 key 的有效期</li>
+<li>setex<br>在给 key 设置 value 的同时，还设置过期时间。</li>
+<li>psetex<br>和 setex 类似，只不过这里的时间单位是毫秒。</li>
+<li>setnx<br>默认情况下， set 命令会覆盖已经存在的 key，setnx 则不会。</li>
+<li>msetnx<br>批量设置。</li>
+<li>setrange<br>覆盖一个已经存在的 key 的value。</li>
+<li>strlen<br>查看字符串长度</li>
+</ul>
+<h3 id="3-2-1"><a href="#3-2-1" class="headerlink" title="3.2.1"></a>3.2.1</h3><p>BIT命令<br>在 Redis 中，字符串都是以二进制的方式来存储的。例如 set k1 a，a 对应的 ASCII 码是 97，97 转为<br>二进制是 01100001，BIT 相关的命令就是对二进制进行操作的。</p>
+<ul>
+<li>getbit<br>key 对应的 value 在 offset 处的 bit 值。</li>
+<li>setbit<br>修改 key 对应的 value 在 offset 处的 bit 值</li>
+<li>bitcount<br>统计二进制数据中 1 的个数</li>
+</ul>
+<h3 id="3-3-List"><a href="#3-3-List" class="headerlink" title="3.3 List"></a>3.3 List</h3><ul>
+<li>lpush<br>将所有指定的值插入到存于 key 的列表的头部。如果 key 不存在，那么在进行 push 操作前会创建一个<br>空列表。 如果 key 对应的值不是一个 list 的话，那么会返回一个错误。</li>
+<li>lrange<br>返回列表指定区间内的元素。</li>
+<li>rpush<br>向存于 key 的列表的尾部插入所有指定的值。</li>
+<li>rpop<br>移除并返回列表的尾元素。</li>
+<li>lpop<br>移除并返回列表的头元素。</li>
+<li>lindex<br>返回列表中，下标为 index 的元素。</li>
+<li>ltrim<br>ltrim 可以对一个列表进行修剪。</li>
+<li>blpop<br>阻塞式的弹出，相当于 lpop 的阻塞版</li>
+</ul>
+<h3 id="3-4-Set"><a href="#3-4-Set" class="headerlink" title="3.4 Set"></a>3.4 Set</h3><ul>
+<li>sadd<br>添加元素到一个 key 中</li>
+<li>smembers<br>获取一个 key 下的所有元素</li>
+<li>srem<br>移除指定的元素</li>
+<li>sismemeber<br>返回某一个成员是否在集合中</li>
+<li>scard<br>返回集合的数量</li>
+<li>srandmember<br>随机返回一个元素</li>
+<li>spop<br>随机返回并且出栈一个元素。</li>
+<li>smove<br>把一个元素从一个集合移到另一个集合中去。</li>
+<li>sdiff<br>返回两个集合的差集。</li>
+<li>sinter<br>返回两个集合的交集。</li>
+<li>sdiffstore<br>这个类似于 sdiff ，不同的是，计算出来的结果会保存在一个新的集合中。</li>
+<li>sinterstore<br>类似于 sinter，只是将计算出来的交集保存到一个新的集合中。</li>
+<li>sunion<br>求并集。</li>
+<li>sunionstore<br>求并集并且将结果保存到新的集合中。</li>
+</ul>
+<h3 id="3-5-Hash"><a href="#3-5-Hash" class="headerlink" title="3.5 Hash"></a>3.5 Hash</h3><p>在 hash 结构中，key 是一个字符串，value 则是一个 key/value 键值对。</p>
+<ul>
+<li>hset<br>添加值。</li>
+<li>hget<br>获取值</li>
+<li>hmset<br>批量设置</li>
+<li>hmget<br>批量获取</li>
+<li>hdel<br>删除一个指定的 field</li>
+<li>hsetnx<br>默认情况下，如果 key 和 field 相同，会覆盖掉已有的 value，hsetnx 则不会。</li>
+<li>hvals<br>获取所有的 value</li>
+<li>hkeys<br>获取所有的 key</li>
+<li>hgetall<br>同时获取所有的 key 和 value</li>
+<li>hexists<br>返回 field 是否存在</li>
+<li>hincrby<br>给指定的 value 自增</li>
+<li>hincrbyfloat<br>可以自增一个浮点数</li>
+<li>hlen<br>返回 某一个 key 中 value 的数量</li>
+<li>hstrlen<br>返回某一个 key 中的某一个 field 的字符串长度</li>
+</ul>
+<h3 id="3-6-Zset"><a href="#3-6-Zset" class="headerlink" title="3.6 Zset"></a>3.6 Zset</h3><ul>
+<li>zadd<br>将指定的元素添加到有序集合中。</li>
+<li>zscore<br>返回 member 的 score 值</li>
+<li>zrange<br>返回集合中的一组元素。</li>
+<li>zrevrange<br>返回一组元素，但是是倒序。</li>
+<li>zcard<br>返回元素个数</li>
+<li>zcount<br>返回 score 在某一个区间内的元素。</li>
+<li>zrangebyscore<br>按照 score 的范围返回元素。</li>
+<li>zrank<br>返回元素的排名（从小到大</li>
+<li>zrevrank<br>返回元素排名（从大到小</li>
+<li>zincrbyscore<br>自增</li>
+<li>zinterstore<br>给两个集合求交集。</li>
+<li>zrem<br>弹出一个元素</li>
+<li>zlexcount<br>计算有序集合中成员数量</li>
+<li>zrangebylex<br>返回指定区间内的成员。<h3 id="3-7-key"><a href="#3-7-key" class="headerlink" title="3.7 key"></a>3.7 key</h3></li>
+<li>del<br>删除一个 key/value</li>
+<li>dump<br>序列化给定的 key</li>
+<li>exists<br>判断一个 key 是否存在</li>
+<li>ttl<br>查看一个 key 的有效期</li>
+<li>expire<br>给一个 key 设置有效期，如果 key 在过期之前被重新 set 了，则过期时间会失效。</li>
+<li>persist<br>移除一个 key 的过期时间</li>
+<li>keys *<br>查看所有的 key</li>
+<li>pttl<br>和 ttl 一样，只不过这里返回的是毫秒</li>
+</ul>
+<h2 id="4-Redis-的-Java-客户端"><a href="#4-Redis-的-Java-客户端" class="headerlink" title="4.Redis 的 Java 客户端"></a>4.Redis 的 Java 客户端</h2><h3 id="4-1-开启远程连接"><a href="#4-1-开启远程连接" class="headerlink" title="4.1 开启远程连接"></a>4.1 开启远程连接</h3><p>Redis 默认是不支持远程连接的，需要手动开启。<br>一共修改两个地方：</p>
+<ol>
+<li>注释掉 bind: 127.0.0.1</li>
+<li>开启密码校验，去掉 requirepass 的注释<br>改完之后，保存退出，启动 Redis<h3 id="4-2-Jedis"><a href="#4-2-Jedis" class="headerlink" title="4.2 Jedis"></a>4.2 Jedis</h3><h4 id="4-2-1-基本使用"><a href="#4-2-1-基本使用" class="headerlink" title="4.2.1 基本使用"></a>4.2.1 基本使用</h4>Jedis 的 GitHub 地址：<a href="https://github.com/xetorthio/jedis" target="_blank">https://github.com/xetorthio/jedis</a><br>首先创建一个普通的 Maven 项目。<br>项目创建成功后，添加Jedis 依赖：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;redis.clients&lt;&#x2F;groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;jedis&lt;&#x2F;artifactId&gt;</span><br><span class="line">    &lt;version&gt;3.2.0&lt;&#x2F;version&gt;</span><br><span class="line">    &lt;type&gt;jar&lt;&#x2F;type&gt;</span><br><span class="line">    &lt;scope&gt;compile&lt;&#x2F;scope&gt;</span><br><span class="line">&lt;&#x2F;dependency&gt;</span><br></pre></td></tr></table></figure>
+然后创建一个测试方法。<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyJedis</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//1.构造一个 Jedis 对象，因为这里使用的默认端口 6379，所以不用配置端口</span></span><br><span class="line">        Jedis jedis = <span class="keyword">new</span> Jedis(<span class="string">"192.168.91.128"</span>);</span><br><span class="line">        <span class="comment">//2.密码认证</span></span><br><span class="line">        jedis.auth(<span class="string">"wangts"</span>);</span><br><span class="line">        <span class="comment">//3.测试是否连接成功</span></span><br><span class="line">        String ping = jedis.ping();</span><br><span class="line">        <span class="comment">//4.返回 pong 表示连接成功</span></span><br><span class="line">        System.out.println(ping);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+<p>对于 Jedis 而言，一旦连接上 Redis 服务端，剩下的操作都很容易了。<br>在 Jedis 中，由于方法的 API 和 Redis 的命令高度一致，所以，Jedis 中的方法见名知意，直接使用即<br>可。</p>
+<h4 id="4-2-2-连接池"><a href="#4-2-2-连接池" class="headerlink" title="4.2.2 连接池"></a>4.2.2 连接池</h4><p>在实际应用中，Jedis 实例我们一般都是通过连接池来获取，由于 Jedis 对象不是线程安全的，所以，当<br>我们使用 Jedis 对象时，从连接池获取 Jedis，使用完成之后，再还给连接池。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JedisPoolTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        <span class="comment">//1. 构造一个 Jedis 连接池</span></span><br><span class="line">        JedisPool pool = <span class="keyword">new</span> JedisPool(<span class="string">"192.168.91.128"</span>, <span class="number">6379</span>);</span><br><span class="line">        <span class="comment">//2. 从连接池中获取一个 Jedis 连接</span></span><br><span class="line">        Jedis jedis = pool.getResource();</span><br><span class="line">        <span class="comment">//3. Jedis 操作</span></span><br><span class="line">        String ping = jedis.ping();</span><br><span class="line">        System.out.println(ping);</span><br><span class="line">        <span class="comment">//4. 归还连接</span></span><br><span class="line">        jedis.close();</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果第三步抛出异常的话，会导致第四步无法执行，所以，我们要对代码进行改进，确保第四步能够执<br>行。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JedisPoolTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Jedis jedis = <span class="keyword">null</span>;</span><br><span class="line">        <span class="comment">//1. 构造一个 Jedis 连接池</span></span><br><span class="line">        JedisPool pool = <span class="keyword">new</span> JedisPool(<span class="string">"192.168.91.128"</span>, <span class="number">6379</span>);</span><br><span class="line">        <span class="comment">//2. 从连接池中获取一个 Jedis 连接</span></span><br><span class="line">        jedis = pool.getResource();</span><br><span class="line">        jedis.auth(<span class="string">"wangts"</span>);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="comment">//3. Jedis 操作</span></span><br><span class="line">            String ping = jedis.ping();</span><br><span class="line">            System.out.println(ping);</span><br><span class="line">       &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">       &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            <span class="comment">//4. 归还连接</span></span><br><span class="line">            <span class="keyword">if</span> (jedis != <span class="keyword">null</span>) &#123;</span><br><span class="line">                jedis.close();</span><br><span class="line">           &#125;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>通过 finally 我们可以确保 jedis 一定被关闭。<br>利用 JDK1.7 中的 try-with-resource 特性，可以对上面的代码进行改造：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">JedisPoolTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        JedisPool pool = <span class="keyword">new</span> JedisPool(<span class="string">"192.168.91.128"</span>);</span><br><span class="line">        <span class="keyword">try</span>(Jedis jedis = pool.getResource()) &#123;</span><br><span class="line">            jedis.auth(<span class="string">"wangts"</span>);</span><br><span class="line">            String ping = jedis.ping();</span><br><span class="line">            System.out.println(ping);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<p>这段代码的作用和上面的是一致的。<br>但是，上面这段代码无法实现强约束。我们可以做进一步的改进：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">CallWithJedis</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">void</span> <span class="title">call</span><span class="params">(Jedis jedis)</span></span>;</span><br><span class="line">&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Redis</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> JedisPool pool;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">Redis</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        GenericObjectPoolConfig config = <span class="keyword">new</span> GenericObjectPoolConfig();</span><br><span class="line">        <span class="comment">//连接池最大空闲数</span></span><br><span class="line">        config.setMaxIdle(<span class="number">300</span>);</span><br><span class="line">        <span class="comment">//最大连接数</span></span><br><span class="line">        config.setMaxTotal(<span class="number">1000</span>);</span><br><span class="line">        <span class="comment">//连接最大等待时间，如果是 -1 表示没有限制</span></span><br><span class="line">        config.setMaxWaitMillis(<span class="number">30000</span>);</span><br><span class="line">        <span class="comment">//在空闲时检查有效性</span></span><br><span class="line">        config.setTestOnBorrow(<span class="keyword">true</span>);</span><br><span class="line">        <span class="comment">/**</span></span><br><span class="line"><span class="comment">         * 1. Redis 地址</span></span><br><span class="line"><span class="comment">         * 2. Redis 端口</span></span><br><span class="line"><span class="comment">         * 3. 连接超时时间</span></span><br><span class="line"><span class="comment">		 * 4. 密码</span></span><br><span class="line"><span class="comment">         */</span></span><br><span class="line">        pool = <span class="keyword">new</span> JedisPool(config, <span class="string">"192.168.91.128"</span>, <span class="number">6379</span>, <span class="number">30000</span>, <span class="string">"wangts"</span>);</span><br><span class="line">   &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">execute</span><span class="params">(CallWithJedis callWithJedis)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">try</span> (Jedis jedis = pool.getResource()) &#123;</span><br><span class="line">            callWithJedis.call(jedis);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br><span class="line">Redis redis = <span class="keyword">new</span> Redis();</span><br><span class="line">redis.execute(jedis -&gt; &#123;</span><br><span class="line">    System.out.println(jedis.ping());</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="4-3-Lettuce"><a href="#4-3-Lettuce" class="headerlink" title="4.3 Lettuce"></a>4.3 Lettuce</h3><p>GitHub：<a target="_blank" href="https://github.com/lettuce-io/lettuce-core">https://github.com/lettuce-io/lettuce-core</a><br>Lettuce 和 Jedis 的一个比较：</p>
+<blockquote>
+<ol>
+<li>Jedis 在实现的过程中是直接连接 Redis 的，在多个线程之间共享一个 Jedis 实例，这是线程不安全的，<br>如果想在多线程场景下使用 Jedis，就得使用连接池，这样，每个线程都有自己的 Jedis 实例。</li>
+<li>Lettuce 基于目前很火的 Netty NIO 框架来构建，所以克服了 Jedis 中线程不安全的问题，Lettuce<br>支持同步、异步 以及 响应式调用，多个线程可以共享一个连接实例。<br>使用 Lettuce，首先创建一个普通的 Maven 项目，添加 Lettuce 依赖:</li>
+</ol>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;dependency&gt;</span><br><span class="line">    &lt;groupId&gt;io.lettuce&lt;&#x2F;groupId&gt;</span><br><span class="line">    &lt;artifactId&gt;lettuce-core&lt;&#x2F;artifactId&gt;</span><br><span class="line">    &lt;version&gt;5.2.2.RELEASE&lt;&#x2F;version&gt;</span><br><span class="line">&lt;&#x2F;dependency&gt;</span><br></pre></td></tr></table></figure>
+<p>然后来一个简单的测试案例:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LettuceTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        RedisClient redisClient = RedisClient.create(<span class="string">"redis://wangts@192.168.91.128"</span>);</span><br><span class="line">        StatefulRedisConnection&lt;String, String&gt; connect = redisClient.connect();</span><br><span class="line">        RedisCommands&lt;String, String&gt; sync = connect.sync();</span><br><span class="line">        sync.set(<span class="string">"name"</span>, <span class="string">"wangts"</span>);</span><br><span class="line">        String name = sync.get(<span class="string">"name"</span>);</span><br><span class="line">        System.out.println(name);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意这里的密码传递方式，密码直接写在连接地址里边。</p>
+<h2 id="5-Redis-做分布式锁"><a href="#5-Redis-做分布式锁" class="headerlink" title="5 Redis 做分布式锁"></a>5 Redis 做分布式锁</h2><p>问题场景：</p>
+<blockquote>
+<blockquote>
+<p>例如一个简单的用户操作，一个线程去修改用户的状态，首先从数据库中读出用户的状态，然后<br>在内存中进行修改，修改完成后，再存回去。在单线程中，这个操作没有问题，但是在多线程<br>中，由于读取、修改、存 这是三个操作，不是原子操作，所以在多线程中，这样会出问题。<br>对于这种问题，我们可以使用分布式锁来限制程序的并发执行。</p>
+</blockquote>
+</blockquote>
+<h3 id="5-1-基本用法"><a href="#5-1-基本用法" class="headerlink" title="5.1 基本用法"></a>5.1 基本用法</h3><p><strong>分布式锁实现的思路很简单，就是进来一个线程先占位，当别的线程进来操作时，发现已经有人占位了，就会放弃或者稍后再试。</strong></p>
+<p>在 Redis 中，占位一般使用 setnx 指令，先进来的线程先占位，线程的操作执行完成后，再调用 del 指令释放位子。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LockTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Redis redis = <span class="keyword">new</span> Redis();</span><br><span class="line">        redis.execute(jedis-&gt;&#123;</span><br><span class="line">            Long setnx = jedis.setnx(<span class="string">"k1"</span>, <span class="string">"v1"</span>);</span><br><span class="line">            <span class="keyword">if</span> (setnx == <span class="number">1</span>) &#123;</span><br><span class="line">                <span class="comment">//没人占位</span></span><br><span class="line">                jedis.set(<span class="string">"name"</span>, <span class="string">"wangts"</span>);</span><br><span class="line">                String name = jedis.get(<span class="string">"name"</span>);</span><br><span class="line">                System.out.println(name);</span><br><span class="line">                jedis.del(<span class="string">"k1"</span>);<span class="comment">//释放资源</span></span><br><span class="line">           &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                <span class="comment">//有人占位，停止/暂缓 操作</span></span><br><span class="line">           &#125;</span><br><span class="line">       &#125;);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>上面的代码存在一个小小问题：如果代码业务执行的过程中抛异常或者挂了，这样会导致 del 指令没有<br>被调用，这样，k1 无法释放，后面来的请求全部堵塞在这里，锁也永远得不到释放。</p>
+<p>要解决这个问题，我们可以给锁添加一个过期时间，确保锁在一定的时间之后，能够得到释放。改进后<br>的代码如下:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">pulic <span class="class"><span class="keyword">class</span> <span class="title">LockTest</span> </span>&#123;</span><br><span class="line">   <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">       Redis redis = <span class="keyword">new</span> Redis();</span><br><span class="line">       redis.execute(jedis-&gt;&#123;</span><br><span class="line">           Long setnx = jedis.setnx(<span class="string">"k1"</span>, <span class="string">"v1"</span>);</span><br><span class="line">           <span class="keyword">if</span> (setnx == <span class="number">1</span>) &#123;</span><br><span class="line">               <span class="comment">//给锁添加一个过期时间，防止应用在运行过程中抛出异常导致锁无法及时得到释放</span></span><br><span class="line">               jedis.expire(<span class="string">"k1"</span>, <span class="number">5</span>);</span><br><span class="line">               <span class="comment">//没人占位</span></span><br><span class="line">               jedis.set(<span class="string">"name"</span>, <span class="string">"wangts"</span>);</span><br><span class="line">               String name = jedis.get(<span class="string">"name"</span>);</span><br><span class="line">               System.out.println(name);</span><br><span class="line">               jedis.del(<span class="string">"k1"</span>);<span class="comment">//释放资源</span></span><br><span class="line">			&#125;<span class="keyword">else</span>&#123;</span><br><span class="line">			                <span class="comment">//有人占位，停止/暂缓 操作</span></span><br><span class="line">			   &#125;</span><br><span class="line">		   &#125;);</span><br><span class="line">	   &#125;</span><br><span class="line">	&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样改造之后，还有一个问题，就是在获取锁和设置过期时间之间如果如果服务器突然挂掉了，这个时<br>候锁被占用，无法及时得到释放，也会造成死锁，因为获取锁和设置过期时间是两个操作，不具备原子<br>性。<br>为了解决这个问题，从 Redis2.8 开始，setnx 和 expire 可以通过一个命令一起来执行了，我们对上述<br>代码再做改进：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LockTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Redis redis = <span class="keyword">new</span> Redis();</span><br><span class="line">        redis.execute(jedis-&gt;&#123;</span><br><span class="line">            String set = jedis.set(<span class="string">"k1"</span>, <span class="string">"v1"</span>, <span class="keyword">new</span> SetParams().nx().ex(<span class="number">5</span>));</span><br><span class="line">            <span class="keyword">if</span> (set !=<span class="keyword">null</span> &amp;&amp; <span class="string">"OK"</span>.equals(set)) &#123;</span><br><span class="line">                <span class="comment">//给锁添加一个过期时间，防止应用在运行过程中抛出异常导致锁无法及时得到释放</span></span><br><span class="line">                jedis.expire(<span class="string">"k1"</span>, <span class="number">5</span>);</span><br><span class="line">                <span class="comment">//没人占位</span></span><br><span class="line">                jedis.set(<span class="string">"name"</span>, <span class="string">"wangts"</span>);</span><br><span class="line">                String name = jedis.get(<span class="string">"name"</span>);</span><br><span class="line">                System.out.println(name);</span><br><span class="line">                jedis.del(<span class="string">"k1"</span>);<span class="comment">//释放资源</span></span><br><span class="line">           &#125;<span class="keyword">else</span>&#123;</span><br><span class="line">                <span class="comment">//有人占位，停止/暂缓 操作</span></span><br><span class="line">           &#125;</span><br><span class="line">       &#125;);</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="5-2-解决超时问题"><a href="#5-2-解决超时问题" class="headerlink" title="5.2 解决超时问题"></a>5.2 解决超时问题</h3><p>为了防止业务代码在执行的时候抛出异常，我们给每一个锁添加了一个超时时间，超时之后，锁会被自<br>动释放，但是这也带来了一个新的问题：如果要执行的业务非常耗时，可能会出现紊乱。举个例子：第<br>一个线程首先获取到锁，然后开始执行业务代码，但是业务代码比较耗时，执行了 8 秒，这样，会在第<br>一个线程的任务还未执行成功锁就会被释放了，此时第二个线程会获取到锁开始执行，在第二个线程刚<br>执行了 3 秒，第一个线程也执行完了，此时第一个线程会释放锁，但是注意，它释放的第二个线程的<br>锁，释放之后，第三个线程进来。<br>对于这个问题，我们可以从两个角度入手：</p>
+<ul>
+<li>尽量避免在获取锁之后，执行耗时操作。</li>
+<li>可以在锁上面做文章，将锁的 value 设置为一个随机字符串，每次释放锁的时候，都去比较随机字符串是否一致，如果一致，再去释放，否则，不释放。</li>
+</ul>
+<p>对于第二种方案，由于释放锁的时候，要去查看锁的 value，第二个比较 value 的值是否正确，第三步<br>释放锁，有三个步骤，很明显三个步骤不具备原子性，为了解决这个问题，我们得引入 Lua 脚本。<br>Lua 脚本的优势：</p>
+<ul>
+<li>使用方便，Redis 中内置了对 Lua 脚本的支持。</li>
+<li>Lua 脚本可以在 Redis 服务端原子的执行多个 Redis 命令。</li>
+<li>由于网络在很大程度上会影响到 Redis 性能，而使用 Lua 脚本可以让多个命令一次执行，可以有效解决网络给 Redis 带来的性能问题。</li>
+</ul>
+<p>在 Redis 中，使用 Lua 脚本，大致上两种思路：</p>
+<ol>
+<li>提前在 Redis 服务端写好 Lua 脚本，然后在 Java 客户端去调用脚本（推荐）。</li>
+<li>可以直接在 Java 端去写 Lua 脚本，写好之后，需要执行时，每次将脚本发送到 Redis 上去执行。</li>
+</ol>
+<p>首先在 Redis 服务端创建 Lua 脚本，内容如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">if redis.call(&quot;get&quot;,KEYS[1])&#x3D;&#x3D;ARGV[1] then</span><br><span class="line">   return redis.call(&quot;del&quot;,KEYS[1])</span><br><span class="line">else</span><br><span class="line">   return 0</span><br><span class="line">end</span><br></pre></td></tr></table></figure>
+<p>接下来，可以给 Lua 脚本求一个 SHA1 和，命令如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cat lua&#x2F;releasewherevalueequal.lua | redis-cli -a javaboy script load --pipe</span><br></pre></td></tr></table></figure>
+
+<img src="/2020/08/18/Redis%E7%AC%94%E8%AE%B0/4.png" class="" title="This is an example image">
+
+<p>script load 这个命令会在 Redis 服务器中缓存 Lua 脚本，并返回脚本内容的 SHA1 校验和，然后在<br>Java 端调用时，传入 SHA1 校验和作为参数，这样 Redis 服务端就知道执行哪个脚本了。<br>接下来，在 Java 端调用这个脚本。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">LuaTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Redis redis = <span class="keyword">new</span> Redis();</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; <span class="number">2</span>; i++) &#123;</span><br><span class="line">            redis.execute(jedis -&gt; &#123;</span><br><span class="line">                <span class="comment">//1.先获取一个随机字符串</span></span><br><span class="line">                String value = UUID.randomUUID().toString();</span><br><span class="line">                <span class="comment">//2.获取锁</span></span><br><span class="line">                String k1 = jedis.set(<span class="string">"k1"</span>, value, <span class="keyword">new</span> SetParams().nx().ex(<span class="number">5</span>));</span><br><span class="line">                <span class="comment">//3.判断是否成功拿到锁</span></span><br><span class="line">                <span class="keyword">if</span> (k1 != <span class="keyword">null</span> &amp;&amp; <span class="string">"OK"</span>.equals(k1)) &#123;</span><br><span class="line">                    <span class="comment">//4. 具体的业务操作</span></span><br><span class="line">                    jedis.set(<span class="string">"site"</span>, <span class="string">"www.wangts.site"</span>);</span><br><span class="line">                    String site = jedis.get(<span class="string">"site"</span>);</span><br><span class="line">                    System.out.println(site);</span><br><span class="line">                    <span class="comment">//5.释放锁</span></span><br><span class="line">                    jedis.evalsha(<span class="string">"b8059ba43af6ffe8bed3db65bac35d452f8115d8"</span>,</span><br><span class="line">Arrays.asList(<span class="string">"k1"</span>), Arrays.asList(value));</span><br><span class="line">               &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                    System.out.println(<span class="string">"没拿到锁"</span>);</span><br><span class="line">               &#125;</span><br><span class="line">           &#125;);</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure> 
+      <!-- reward -->
+      
+      <div id="reword-out">
+        <div id="reward-btn">
+          打赏
+        </div>
+      </div>
+      
+    </div>
+    
+
+    <!-- copyright -->
+    
+    <div class="declare">
+      <ul class="post-copyright">
+        <li>
+          <i class="ri-copyright-line"></i>
+          <strong>版权声明： </strong>
+          本博客所有文章除特别声明外，著作权归作者所有。转载请注明出处！
+        </li>
+      </ul>
+    </div>
+    
+    <footer class="article-footer">
+       
+<div class="share-btn">
+      <span class="share-sns share-outer">
+        <i class="ri-share-forward-line"></i>
+        分享
+      </span>
+      <div class="share-wrap">
+        <i class="arrow"></i>
+        <div class="share-icons">
+          
+          <a class="weibo share-sns" href="javascript:;" data-type="weibo">
+            <i class="ri-weibo-fill"></i>
+          </a>
+          <a class="weixin share-sns wxFab" href="javascript:;" data-type="weixin">
+            <i class="ri-wechat-fill"></i>
+          </a>
+          <a class="qq share-sns" href="javascript:;" data-type="qq">
+            <i class="ri-qq-fill"></i>
+          </a>
+          <a class="douban share-sns" href="javascript:;" data-type="douban">
+            <i class="ri-douban-line"></i>
+          </a>
+          <!-- <a class="qzone share-sns" href="javascript:;" data-type="qzone">
+            <i class="icon icon-qzone"></i>
+          </a> -->
+          
+          <a class="facebook share-sns" href="javascript:;" data-type="facebook">
+            <i class="ri-facebook-circle-fill"></i>
+          </a>
+          <a class="twitter share-sns" href="javascript:;" data-type="twitter">
+            <i class="ri-twitter-fill"></i>
+          </a>
+          <a class="google share-sns" href="javascript:;" data-type="google">
+            <i class="ri-google-fill"></i>
+          </a>
+        </div>
+      </div>
+</div>
+
+<div class="wx-share-modal">
+    <a class="modal-close" href="javascript:;"><i class="ri-close-circle-line"></i></a>
+    <p>扫一扫，分享到微信</p>
+    <div class="wx-qrcode">
+      <img src="//api.qrserver.com/v1/create-qr-code/?size=150x150&data=http://wangts.site/2020/08/18/Redis%E7%AC%94%E8%AE%B0/" alt="微信分享二维码">
+    </div>
+</div>
+
+<div id="share-mask"></div>  
+  <ul class="article-tag-list" itemprop="keywords"><li class="article-tag-list-item"><a class="article-tag-list-link" href="/tags/%E5%BC%80%E5%8F%91%E6%89%8B%E5%86%8C/" rel="tag">开发手册</a></li></ul>
+
+    </footer>
+  </div>
+
+   
+  <nav class="article-nav">
+    
+    
+      <a href="/2020/08/17/Mysql%E8%A1%A8%E5%AD%97%E6%AE%B5%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/" class="article-nav-link">
+        <strong class="article-nav-caption">下一篇</strong>
+        <div class="article-nav-title">Mysql表字段设计原则</div>
+      </a>
+    
+  </nav>
+
+   
+<!-- valine评论 -->
+<div id="vcomments-box">
+  <div id="vcomments"></div>
+</div>
+<script src="//cdn1.lncld.net/static/js/3.0.4/av-min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/valine@1.4.14/dist/Valine.min.js"></script>
+<script>
+  new Valine({
+    el: "#vcomments",
+    app_id: "qJP4WkbLmBpuiutXgUcIRS5S-gzGzoHsz",
+    app_key: "UKnAIhmbhJsuXH69KOGBGBRn",
+    path: window.location.pathname,
+    avatar: "monsterid",
+    placeholder: "给我的文章加点评论吧~",
+    recordIP: true,
+  });
+  const infoEle = document.querySelector("#vcomments .info");
+  if (infoEle && infoEle.childNodes && infoEle.childNodes.length > 0) {
+    infoEle.childNodes.forEach(function (item) {
+      item.parentNode.removeChild(item);
+    });
+  }
+</script>
+<style>
+  #vcomments-box {
+    padding: 5px 30px;
+  }
+
+  @media screen and (max-width: 800px) {
+    #vcomments-box {
+      padding: 5px 0px;
+    }
+  }
+
+  #vcomments-box #vcomments {
+    background-color: #fff;
+  }
+
+  .v .vlist .vcard .vh {
+    padding-right: 20px;
+  }
+
+  .v .vlist .vcard {
+    padding-left: 10px;
+  }
+</style>
+
+ 
+     
+</article>
+
+</section>
+      <footer class="footer">
+  <div class="outer">
+    <ul>
+      <li>
+        Copyrights &copy;
+        2019-2020
+        <i class="ri-heart-fill heart_icon"></i> Wangts
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        
+        由 <a href="https://hexo.io" target="_blank">Hexo</a> 强力驱动
+        <span class="division">|</span>
+        主题 - <a href="https://github.com/Shen-Yu/hexo-theme-ayer" target="_blank">Ayer</a>
+        
+      </li>
+    </ul>
+    <ul>
+      <li>
+        
+        
+        <span>
+  <span><i class="ri-user-3-fill"></i>访问人数:<span id="busuanzi_value_site_uv"></span></s>
+  <span class="division">|</span>
+  <span><i class="ri-eye-fill"></i>浏览次数:<span id="busuanzi_value_page_pv"></span></span>
+</span>
+        
+      </li>
+    </ul>
+    <ul>
+      
+    </ul>
+    <ul>
+      <li>
+        <!-- cnzz统计 -->
+        
+        <script type="text/javascript" src='https://v1.cnzz.com/z_stat.php?id=1278578668&amp;web_id=1278578668'></script>
+        
+      </li>
+    </ul>
+  </div>
+</footer>
+      <div class="float_btns">
+        <div class="totop" id="totop">
+  <i class="ri-arrow-up-line"></i>
+</div>
+
+<div class="todark" id="todark">
+  <i class="ri-moon-line"></i>
+</div>
+
+      </div>
+    </main>
+    <aside class="sidebar on">
+      <button class="navbar-toggle"></button>
+<nav class="navbar">
+  
+  <div class="logo">
+    <a href="/"><img src="/images/ayer-side.svg" alt="面朝大海"></a>
+  </div>
+  
+  <ul class="nav nav-main">
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/">主页</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/archives">归档</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/categories">分类</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/tags">标签</a>
+    </li>
+    
+    <li class="nav-item">
+      <a class="nav-item-link" href="/2020/about">关于我</a>
+    </li>
+    
+  </ul>
+</nav>
+<nav class="navbar navbar-bottom">
+  <ul class="nav">
+    <li class="nav-item">
+      
+      <a class="nav-item-link nav-item-search"  title="搜索">
+        <i class="ri-search-line"></i>
+      </a>
+      
+      
+    </li>
+  </ul>
+</nav>
+<div class="search-form-wrap">
+  <div class="local-search local-search-plugin">
+  <input type="search" id="local-search-input" class="local-search-input" placeholder="Search...">
+  <div id="local-search-result" class="local-search-result"></div>
+</div>
+</div>
+    </aside>
+    <script>
+      if (window.matchMedia("(max-width: 768px)").matches) {
+        document.querySelector('.content').classList.remove('on');
+        document.querySelector('.sidebar').classList.remove('on');
+      }
+    </script>
+    <div id="mask"></div>
+
+<!-- #reward -->
+<div id="reward">
+  <span class="close"><i class="ri-close-line"></i></span>
+  <p class="reward-p"><i class="ri-cup-line"></i>加个好友呗~</p>
+  <div class="reward-box">
+    
+    
+    <div class="reward-item">
+      <img class="reward-img" src="/images/wechat.jpg">
+      <span class="reward-type">微信</span>
+    </div>
+    
+  </div>
+</div>
+    
+<script src="/js/jquery-2.0.3.min.js"></script>
+
+
+<script src="/js/lazyload.min.js"></script>
+
+<!-- Tocbot -->
+
+
+<script src="/js/tocbot.min.js"></script>
+
+<script>
+  tocbot.init({
+    tocSelector: '.tocbot',
+    contentSelector: '.article-entry',
+    headingSelector: 'h1, h2, h3, h4, h5, h6',
+    hasInnerContainers: true,
+    scrollSmooth: true,
+    scrollContainer: 'main',
+    positionFixedSelector: '.tocbot',
+    positionFixedClass: 'is-position-fixed',
+    fixedSidebarOffset: 'auto'
+  });
+</script>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/jquery-modal@0.9.2/jquery.modal.min.css">
+<script src="https://cdn.jsdelivr.net/npm/justifiedGallery@3.7.0/dist/js/jquery.justifiedGallery.min.js"></script>
+
+<script src="/dist/main.js"></script>
+
+<!-- ImageViewer -->
+
+<!-- Root element of PhotoSwipe. Must have class pswp. -->
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <!-- Background of PhotoSwipe. 
+         It's a separate element as animating opacity is faster than rgba(). -->
+    <div class="pswp__bg"></div>
+
+    <!-- Slides wrapper with overflow:hidden. -->
+    <div class="pswp__scroll-wrap">
+
+        <!-- Container that holds slides. 
+            PhotoSwipe keeps only 3 of them in the DOM to save memory.
+            Don't modify these 3 pswp__item elements, data is added later on. -->
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        <!-- Default (PhotoSwipeUI_Default) interface on top of sliding area. Can be changed. -->
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                <!--  Controls are self-explanatory. Order can be changed. -->
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" style="display:none" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                <!-- Preloader demo http://codepen.io/dimsemenov/pen/yyBWoR -->
+                <!-- element will get class pswp__preloader--active when preloader is running -->
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css">
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"></script>
+
+<script>
+    function viewer_init() {
+        let pswpElement = document.querySelectorAll('.pswp')[0];
+        let $imgArr = document.querySelectorAll(('.article-entry img:not(.reward-img)'))
+
+        $imgArr.forEach(($em, i) => {
+            $em.onclick = () => {
+                // slider展开状态
+                // todo: 这样不好，后面改成状态
+                if (document.querySelector('.left-col.show')) return
+                let items = []
+                $imgArr.forEach(($em2, i2) => {
+                    let img = $em2.getAttribute('data-idx', i2)
+                    let src = $em2.getAttribute('data-target') || $em2.getAttribute('src')
+                    let title = $em2.getAttribute('alt')
+                    // 获得原图尺寸
+                    const image = new Image()
+                    image.src = src
+                    items.push({
+                        src: src,
+                        w: image.width || $em2.width,
+                        h: image.height || $em2.height,
+                        title: title
+                    })
+                })
+                var gallery = new PhotoSwipe(pswpElement, PhotoSwipeUI_Default, items, {
+                    index: parseInt(i)
+                });
+                gallery.init()
+            }
+        })
+    }
+    viewer_init()
+</script>
+
+<!-- MathJax -->
+
+<!-- Katex -->
+
+<!-- busuanzi  -->
+
+
+<script src="/js/busuanzi-2.3.pure.min.js"></script>
+
+
+<!-- ClickLove -->
+
+<!-- ClickBoom1 -->
+
+<!-- ClickBoom2 -->
+
+
+<script src="/js/clickBoom2.js"></script>
+
+
+<!-- CodeCopy -->
+
+
+<link rel="stylesheet" href="/css/clipboard.css">
+
+<script src="https://cdn.jsdelivr.net/npm/clipboard@2/dist/clipboard.min.js"></script>
+<script>
+  function wait(callback, seconds) {
+    var timelag = null;
+    timelag = window.setTimeout(callback, seconds);
+  }
+  !function (e, t, a) {
+    var initCopyCode = function(){
+      var copyHtml = '';
+      copyHtml += '<button class="btn-copy" data-clipboard-snippet="">';
+      copyHtml += '<i class="ri-file-copy-2-line"></i><span>COPY</span>';
+      copyHtml += '</button>';
+      $(".highlight .code pre").before(copyHtml);
+      $(".article pre code").before(copyHtml);
+      var clipboard = new ClipboardJS('.btn-copy', {
+        target: function(trigger) {
+          return trigger.nextElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        let $btn = $(e.trigger);
+        $btn.addClass('copied');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-checkbox-circle-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPIED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-checkbox-circle-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+      clipboard.on('error', function(e) {
+        e.clearSelection();
+        let $btn = $(e.trigger);
+        $btn.addClass('copy-failed');
+        let $icon = $($btn.find('i'));
+        $icon.removeClass('ri-file-copy-2-line');
+        $icon.addClass('ri-time-line');
+        let $span = $($btn.find('span'));
+        $span[0].innerText = 'COPY FAILED';
+        
+        wait(function () { // 等待两秒钟后恢复
+          $icon.removeClass('ri-time-line');
+          $icon.addClass('ri-file-copy-2-line');
+          $span[0].innerText = 'COPY';
+        }, 2000);
+      });
+    }
+    initCopyCode();
+  }(window, document);
+</script>
+
+
+<!-- CanvasBackground -->
+
+
+    
+    <div id="music">
+    
+    
+    
+    <iframe frameborder="no" border="1" marginwidth="0" marginheight="0" width="200" height="86"
+        src="//music.163.com/outchain/player?type=2&id=38853&auto=0&height=66"></iframe>
+</div>
+
+<style>
+    #music {
+        position: fixed;
+        right: 15px;
+        bottom: 0;
+        z-index: 998;
+    }
+</style>
+    
+  </div>
+</body>
+
+</html>
