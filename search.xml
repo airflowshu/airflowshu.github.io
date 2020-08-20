@@ -1,6 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Mysql表字段设计原则</title>
+    <url>/2020/08/17/Mysql%E8%A1%A8%E5%AD%97%E6%AE%B5%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/</url>
+    <content><![CDATA[<p>一般重要的字段为类型，长度，属性，非空，索引，自增等等。</p>
+<p> 数据表在进行表字段的设计的时候需要根据业务实际出发，根据字段特性设计合适的字段类型和索引类型、长度和属性等。</p>
+<p>字段的类型有多种，先说下字段中比较常用的类型和长度：</p>
+<a id="more"></a>
+
+
+<h2 id="整数型"><a href="#整数型" class="headerlink" title="整数型"></a>整数型</h2><pre><code>1、整数型的数值类型已经限制了取值范围，有符号整型和无符号整型都有，而M值并不代表可以存储的数值字符长度，它代表的是数据在显示时显示的最小长度；
+
+2、当存储的字符长度超过M值时，没有任何的影响，只要不超过数值类型限制的范围；
+
+3、当存储的字符长度小于M值时，只有在设置了zerofill用0来填充，才能够看到效果，换句话就是说，没有zerofill，M值就是无用的。</code></pre><p>举例子，如果你设置int(11)，那么有个字段值是123，那么这个值在显示宽度上是3位，而设计的是显示的是11位，所以这时候，你如果在字段设计的时候，选择zerofill就可以发现，123变成了00000000123，也就是剩下的8位用0补足了。</p>
+<p>所以我们在设计mysql数据库时，建表时，mysql会自动分配长度：int(11)、tinyint(4)、smallint(6)、mediumint(9)、bigint(20)。</p>
+<p>所以，就用这些默认的显示长度就可以了。不用再去自己填长度，比如搞个int(10)、tinyint(1)之类的，基本没用。而且导致表的字段类型多样化。</p>
+<h2 id="字符串型"><a href="#字符串型" class="headerlink" title="字符串型"></a>字符串型</h2><p><strong>CHAR(M)</strong> , <strong>VARCHAR(M)</strong></p>
+<p>CHAR(M)定义的列的长度为固定的，M取值可以为0～255之间，当保存CHAR值时，在它们的右边填充空格以达到指定的长度。当检索到CHAR值时，尾部的空格被删除掉。在存储或检索过程中不进行大小写转换。CHAR存储定长数据很方便，CHAR字段上的索引效率级高，比如定义char(10)，那么不论你存储的数据是否达到了10个字节，都要占去10个字节的空间,不足的自动用空格填充。</p>
+<p>VARCHAR(M)定义的列的长度为可变长字符串，M取值可以为0~65535之间，(VARCHAR的最大有效长度由最大行大小和使用的字符集确定。整体最大长度是65,532字节）。VARCHAR值保存时只保存需要的字符数，另加一个字节来记录长度(如果列声明的长度超过255，则使用两个字节)。VARCHAR值保存时不进行填充。当值保存和检索时尾部的空格仍保留，符合标准SQL。varchar存储变长数据，但存储效率没有CHAR高。如果一个字段可能的值是不固定长度的，我们只知道它不可能超过10个字符，把它定义为 VARCHAR(10)是最合算的。</p>
+<p>CHAR和VARCHAR最大的不同就是一个是固定长度，一个是可变长度。</p>
+<p>总结一下，从空间上考虑，用varchar合适；从效率上考虑，用char合适，关键是根据实际情况找到权衡点，所有当需要大量查询需求的时候，用char。当对于保存数据量过大的需求时，为了节省储存空间用varchar。</p>
+<p><strong>TEXT</strong></p>
+<p>最大长度为65,535(2的16次方–1)字符的TEXT列。</p>
+<p>Text主要是用来存放非二进制的文本，如论坛帖子,题目，或者百度知道的问题和回答之类。TEXT列不能有默认值，存储或检索过程中，不存在大小写转换，后面如果指定长度，不会报错误，但是这个长度是不起作用的，意思就是你插入数据的时候，超过你指定的长度还是可以正常插入。其实可以总结为用来储存大批量的文本信息的时候，使用TEXT。</p>
+<pre><code>**总结**
+1，长度的区别，char范围是0～255，varchar最长是64k，如果遇到了大文本，考虑使用text，最大能到4G。
+2，效率来说基本是char&gt;varchar&gt;text。
+3，char和varchar可以有默认值，text不能指定默认值。</code></pre><h2 id="时间型"><a href="#时间型" class="headerlink" title="时间型"></a>时间型</h2><p><strong>DATETIME</strong>类型用在你需要同时包含日期和时间信息的值时。MySQL检索并且以’YYYY-MM-DD HH:MM:SS’格式显示DATETIME值，支持的范围<br>是’1000-01-01 00:00:00’到’9999-12-31 23:59:59’。</p>
+<p><strong>DATE</strong>类型用在你仅需要日期值时，没有时间部分。MySQL检索并且以’YYYY-MM-DD’格式显示DATE值，支持的范围是’1000-01-01’到’9999-12-31’。</p>
+<p><strong>TIMESTAMP</strong>列类型提供一种类型，你可以使用它自动地用当前的日期和时间标记INSERT或UPDATE的操作。</p>
+<p><strong>TIME</strong>数据类型表示一天中的时间。MySQL检索并且以”HH:MM:SS”格式显示TIME值。支持的范围是’00:00:00’到’23:59:59’。</p>
+<pre><code>datetime和timestamp的区别：
+
+1.datetime 的日期范围比较大；如果有1970年以前的数据还是要用datetime.但是timestamp 所占存储空间比较小。
+2.timestamp 类型的列还有个特性：默认情况下，在 insert, update 数据时，timestamp 列会自动以当前时间（CURRENT_TIMESTAMP）填充/更新。
+3.timestamp比较受时区timezone的影响以及MYSQL版本和服务器的SQL MODE的影响。</code></pre><h2 id="字段的属性值及用处"><a href="#字段的属性值及用处" class="headerlink" title="字段的属性值及用处"></a>字段的属性值及用处</h2><p><strong>BINARY</strong>：不是函数，是类型转换运算符，它用来强制它后面的字符串为一个二进制字符串，可以理解为在字符串比较的时候区分大小写。</p>
+<p><strong>UNSIGNED</strong>：既为非负数，用此类型可以增加一倍数据长度!</p>
+<img src="/2020/08/17/Mysql%E8%A1%A8%E5%AD%97%E6%AE%B5%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/image1.png" class="" title="This is an unsigned image">
+
+
+<p><strong>ZEROFILL</strong>:刚说过了，数字型字段当存储的字符长度小于INT(M)中的M值时，只有在设置了zerofill用0来填充，才能够看到效果，换句话就是说，没有zerofill，M值就是无用的。</p>
+<p><strong>timestamp</strong>有两个属性，分别是<strong>CURRENT_TIMESTAMP</strong> 和 <strong>ON UPDATE CURRENT_TIMESTAMP</strong> 两种，使用情况分别如下</p>
+<p>1，CURRENT_TIMESTAMP </p>
+<p>当要向数据库执行insert操作时，如果有个timestamp字段属性设为CURRENT_TIMESTAMP，则无论这个字段有没有set值都插入当前系统时间</p>
+<p>2，ON UPDATE CURRENT_TIMESTAMP</p>
+<p>当执行update操作是，并且字段有ON UPDATE CURRENT_TIMESTAMP属性。则字段无论值有没有变化，它的值也会跟着更新为当前UPDATE操作时的时间。</p>
+<h2 id="字段的索引以及设置"><a href="#字段的索引以及设置" class="headerlink" title="字段的索引以及设置"></a>字段的索引以及设置</h2><p>先说下对索引的最简单的理解：</p>
+<p>如果你给一个唯一性的字段加上索引，比如一个字段是房间号，你不设置字段的情况下去搜索RoomNumber=101，那么数据库会去一条一条的搜索数据库中的RoomNumber字段，直到找到101给你返回，但如果你把RoomNumber设置为索引，那么数据库就会直接找到RoomNumber=101这条信息给你返回。所以索引的作用是加快数据库搜索的效率，但是同样的，你给一个字段设置为索引，是要消耗资源的。</p>
+<pre><code>普通索引(**INDEX**)：最基本的索引，没有任何限制。
+
+唯一索引(**UNIQUE**)：与&quot;普通索引&quot;类似，不同的就是：索引列的值必须唯一，但允许有空值。
+
+主键索引(**PRIMARY**)：它 是一种特殊的唯一索引，不允许有空值。
+
+全文索引(**FULLTEXT**)：仅可用于 MyISAM 表， 用于在一篇文章中，检索文本信息的, 针对较大的数据，生成全文索引很耗时耗空间。</code></pre><p>说一下字段的长度问题<br>位（bit）：数据存储的最小单位。每个二进制数字0或者1就是1个位；</p>
+<p>字节（byte）： 8个位构成一个字节；即：1 byte (字节)= 8 bit(位)；</p>
+<p>字符：是指计算机中使用的字母、数字、字和符号。</p>
+<p>比如不同的酒店的房间号的方式是不同的，可能是101，或者是FD101，再或者是亚特兰蒂斯101，这样不确定的字段，为了提高表的复用性，我们可以给出一个长度，比如char(32)，我们可以确定酒店的房间号无论如何都会超过这个长度，这样就可以在节省空间的情况下适应所有的情况，</p>
+<p>但是还有一种情况比如数据库中要存MAC地址，MAC地址格式为XX-XX-XX-XX-XX-XX，一共为12个数字和五个分隔符，那么我们就可以直接char(17)来定死这个字段的长度，因为无论如何MAC地址都不会超过17位。</p>
+<p>其实也会有人觉得我定为char(32)那能比char(17)的查询效率低多少？确实微乎其微，但是从习惯的角度来说，建表要养成一种好的习惯，所以当我们可以确定一个字段的长度的时候，就要直接用规则定死，避免掉后期可能出现的优化。</p>
+]]></content>
+      <categories>
+        <category>数据库</category>
+        <category>Mysql</category>
+      </categories>
+      <tags>
+        <tag>Mysql</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>记录一次线上Redis宕机</title>
     <url>/2020/08/11/%E8%AE%B0%E5%BD%95%E4%B8%80%E6%AC%A1%E7%BA%BF%E4%B8%8ARedis%E5%AE%95%E6%9C%BA/</url>
     <content><![CDATA[<h2 id="SlowLog说明"><a href="#SlowLog说明" class="headerlink" title="SlowLog说明"></a>SlowLog说明</h2><p>Slowlog 是 Redis用来记录查询执行时间的日志系统。注意，这个查询执行时间指的是不包括像客户端响应(talking)、发送回复等IO操作，而单单是执行一个查询命令所耗费的时间。</p>
@@ -89,75 +158,6 @@
       </categories>
       <tags>
         <tag>线上生产记录</tag>
-      </tags>
-  </entry>
-  <entry>
-    <title>Mysql表字段设计原则</title>
-    <url>/2020/08/17/Mysql%E8%A1%A8%E5%AD%97%E6%AE%B5%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/</url>
-    <content><![CDATA[<p>一般重要的字段为类型，长度，属性，非空，索引，自增等等。</p>
-<p> 数据表在进行表字段的设计的时候需要根据业务实际出发，根据字段特性设计合适的字段类型和索引类型、长度和属性等。</p>
-<p>字段的类型有多种，先说下字段中比较常用的类型和长度：</p>
-<a id="more"></a>
-
-
-<h2 id="整数型"><a href="#整数型" class="headerlink" title="整数型"></a>整数型</h2><pre><code>1、整数型的数值类型已经限制了取值范围，有符号整型和无符号整型都有，而M值并不代表可以存储的数值字符长度，它代表的是数据在显示时显示的最小长度；
-
-2、当存储的字符长度超过M值时，没有任何的影响，只要不超过数值类型限制的范围；
-
-3、当存储的字符长度小于M值时，只有在设置了zerofill用0来填充，才能够看到效果，换句话就是说，没有zerofill，M值就是无用的。</code></pre><p>举例子，如果你设置int(11)，那么有个字段值是123，那么这个值在显示宽度上是3位，而设计的是显示的是11位，所以这时候，你如果在字段设计的时候，选择zerofill就可以发现，123变成了00000000123，也就是剩下的8位用0补足了。</p>
-<p>所以我们在设计mysql数据库时，建表时，mysql会自动分配长度：int(11)、tinyint(4)、smallint(6)、mediumint(9)、bigint(20)。</p>
-<p>所以，就用这些默认的显示长度就可以了。不用再去自己填长度，比如搞个int(10)、tinyint(1)之类的，基本没用。而且导致表的字段类型多样化。</p>
-<h2 id="字符串型"><a href="#字符串型" class="headerlink" title="字符串型"></a>字符串型</h2><p><strong>CHAR(M)</strong> , <strong>VARCHAR(M)</strong></p>
-<p>CHAR(M)定义的列的长度为固定的，M取值可以为0～255之间，当保存CHAR值时，在它们的右边填充空格以达到指定的长度。当检索到CHAR值时，尾部的空格被删除掉。在存储或检索过程中不进行大小写转换。CHAR存储定长数据很方便，CHAR字段上的索引效率级高，比如定义char(10)，那么不论你存储的数据是否达到了10个字节，都要占去10个字节的空间,不足的自动用空格填充。</p>
-<p>VARCHAR(M)定义的列的长度为可变长字符串，M取值可以为0~65535之间，(VARCHAR的最大有效长度由最大行大小和使用的字符集确定。整体最大长度是65,532字节）。VARCHAR值保存时只保存需要的字符数，另加一个字节来记录长度(如果列声明的长度超过255，则使用两个字节)。VARCHAR值保存时不进行填充。当值保存和检索时尾部的空格仍保留，符合标准SQL。varchar存储变长数据，但存储效率没有CHAR高。如果一个字段可能的值是不固定长度的，我们只知道它不可能超过10个字符，把它定义为 VARCHAR(10)是最合算的。</p>
-<p>CHAR和VARCHAR最大的不同就是一个是固定长度，一个是可变长度。</p>
-<p>总结一下，从空间上考虑，用varchar合适；从效率上考虑，用char合适，关键是根据实际情况找到权衡点，所有当需要大量查询需求的时候，用char。当对于保存数据量过大的需求时，为了节省储存空间用varchar。</p>
-<p><strong>TEXT</strong></p>
-<p>最大长度为65,535(2的16次方–1)字符的TEXT列。</p>
-<p>Text主要是用来存放非二进制的文本，如论坛帖子,题目，或者百度知道的问题和回答之类。TEXT列不能有默认值，存储或检索过程中，不存在大小写转换，后面如果指定长度，不会报错误，但是这个长度是不起作用的，意思就是你插入数据的时候，超过你指定的长度还是可以正常插入。其实可以总结为用来储存大批量的文本信息的时候，使用TEXT。</p>
-<pre><code>**总结**
-1，长度的区别，char范围是0～255，varchar最长是64k，如果遇到了大文本，考虑使用text，最大能到4G。
-2，效率来说基本是char&gt;varchar&gt;text。
-3，char和varchar可以有默认值，text不能指定默认值。</code></pre><h2 id="时间型"><a href="#时间型" class="headerlink" title="时间型"></a>时间型</h2><p><strong>DATETIME</strong>类型用在你需要同时包含日期和时间信息的值时。MySQL检索并且以’YYYY-MM-DD HH:MM:SS’格式显示DATETIME值，支持的范围<br>是’1000-01-01 00:00:00’到’9999-12-31 23:59:59’。</p>
-<p><strong>DATE</strong>类型用在你仅需要日期值时，没有时间部分。MySQL检索并且以’YYYY-MM-DD’格式显示DATE值，支持的范围是’1000-01-01’到’9999-12-31’。</p>
-<p><strong>TIMESTAMP</strong>列类型提供一种类型，你可以使用它自动地用当前的日期和时间标记INSERT或UPDATE的操作。</p>
-<p><strong>TIME</strong>数据类型表示一天中的时间。MySQL检索并且以”HH:MM:SS”格式显示TIME值。支持的范围是’00:00:00’到’23:59:59’。</p>
-<pre><code>datetime和timestamp的区别：
-
-1.datetime 的日期范围比较大；如果有1970年以前的数据还是要用datetime.但是timestamp 所占存储空间比较小。
-2.timestamp 类型的列还有个特性：默认情况下，在 insert, update 数据时，timestamp 列会自动以当前时间（CURRENT_TIMESTAMP）填充/更新。
-3.timestamp比较受时区timezone的影响以及MYSQL版本和服务器的SQL MODE的影响。</code></pre><h2 id="字段的属性值及用处"><a href="#字段的属性值及用处" class="headerlink" title="字段的属性值及用处"></a>字段的属性值及用处</h2><p><strong>BINARY</strong>：不是函数，是类型转换运算符，它用来强制它后面的字符串为一个二进制字符串，可以理解为在字符串比较的时候区分大小写。</p>
-<p><strong>UNSIGNED</strong>：既为非负数，用此类型可以增加一倍数据长度!</p>
-<img src="/2020/08/17/Mysql%E8%A1%A8%E5%AD%97%E6%AE%B5%E8%AE%BE%E8%AE%A1%E5%8E%9F%E5%88%99/image1.png" class="" title="This is an unsigned image">
-
-
-<p><strong>ZEROFILL</strong>:刚说过了，数字型字段当存储的字符长度小于INT(M)中的M值时，只有在设置了zerofill用0来填充，才能够看到效果，换句话就是说，没有zerofill，M值就是无用的。</p>
-<p><strong>timestamp</strong>有两个属性，分别是<strong>CURRENT_TIMESTAMP</strong> 和 <strong>ON UPDATE CURRENT_TIMESTAMP</strong> 两种，使用情况分别如下</p>
-<p>1，CURRENT_TIMESTAMP </p>
-<p>当要向数据库执行insert操作时，如果有个timestamp字段属性设为CURRENT_TIMESTAMP，则无论这个字段有没有set值都插入当前系统时间</p>
-<p>2，ON UPDATE CURRENT_TIMESTAMP</p>
-<p>当执行update操作是，并且字段有ON UPDATE CURRENT_TIMESTAMP属性。则字段无论值有没有变化，它的值也会跟着更新为当前UPDATE操作时的时间。</p>
-<h2 id="字段的索引以及设置"><a href="#字段的索引以及设置" class="headerlink" title="字段的索引以及设置"></a>字段的索引以及设置</h2><p>先说下对索引的最简单的理解：</p>
-<p>如果你给一个唯一性的字段加上索引，比如一个字段是房间号，你不设置字段的情况下去搜索RoomNumber=101，那么数据库会去一条一条的搜索数据库中的RoomNumber字段，直到找到101给你返回，但如果你把RoomNumber设置为索引，那么数据库就会直接找到RoomNumber=101这条信息给你返回。所以索引的作用是加快数据库搜索的效率，但是同样的，你给一个字段设置为索引，是要消耗资源的。</p>
-<pre><code>普通索引(**INDEX**)：最基本的索引，没有任何限制。
-
-唯一索引(**UNIQUE**)：与&quot;普通索引&quot;类似，不同的就是：索引列的值必须唯一，但允许有空值。
-
-主键索引(**PRIMARY**)：它 是一种特殊的唯一索引，不允许有空值。
-
-全文索引(**FULLTEXT**)：仅可用于 MyISAM 表， 用于在一篇文章中，检索文本信息的, 针对较大的数据，生成全文索引很耗时耗空间。</code></pre><p>说一下字段的长度问题<br>位（bit）：数据存储的最小单位。每个二进制数字0或者1就是1个位；</p>
-<p>字节（byte）： 8个位构成一个字节；即：1 byte (字节)= 8 bit(位)；</p>
-<p>字符：是指计算机中使用的字母、数字、字和符号。</p>
-<p>比如不同的酒店的房间号的方式是不同的，可能是101，或者是FD101，再或者是亚特兰蒂斯101，这样不确定的字段，为了提高表的复用性，我们可以给出一个长度，比如char(32)，我们可以确定酒店的房间号无论如何都会超过这个长度，这样就可以在节省空间的情况下适应所有的情况，</p>
-<p>但是还有一种情况比如数据库中要存MAC地址，MAC地址格式为XX-XX-XX-XX-XX-XX，一共为12个数字和五个分隔符，那么我们就可以直接char(17)来定死这个字段的长度，因为无论如何MAC地址都不会超过17位。</p>
-<p>其实也会有人觉得我定为char(32)那能比char(17)的查询效率低多少？确实微乎其微，但是从习惯的角度来说，建表要养成一种好的习惯，所以当我们可以确定一个字段的长度的时候，就要直接用规则定死，避免掉后期可能出现的优化。</p>
-]]></content>
-      <categories>
-        <category>数据库</category>
-        <category>Mysql</category>
-      </categories>
-      <tags>
-        <tag>Mysql</tag>
       </tags>
   </entry>
   <entry>
