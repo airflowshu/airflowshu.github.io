@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://wangts.site/"/>
-  <updated>2020-08-21T06:40:58.778Z</updated>
+  <updated>2020-08-25T09:09:35.566Z</updated>
   <id>http://wangts.site/</id>
   
   <author>
@@ -15,6 +15,29 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Java8中Stream用法</title>
+    <link href="http://wangts.site/2020/08/25/Java8%E4%B8%ADStream%E7%94%A8%E6%B3%95/"/>
+    <id>http://wangts.site/2020/08/25/Java8%E4%B8%ADStream%E7%94%A8%E6%B3%95/</id>
+    <published>2020-08-25T08:00:06.000Z</published>
+    <updated>2020-08-25T09:09:35.566Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;本文主要整理了Java8的新特性Stream的用法，可以利用新特性的简洁代码实现一些数据转化、处理。&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="Java" scheme="http://wangts.site/categories/Java/"/>
+    
+      <category term="Stream用法" scheme="http://wangts.site/categories/Java/Stream%E7%94%A8%E6%B3%95/"/>
+    
+    
+      <category term="Java" scheme="http://wangts.site/tags/Java/"/>
+    
+  </entry>
   
   <entry>
     <title>自定义注解实现请求幂等性demo</title>
