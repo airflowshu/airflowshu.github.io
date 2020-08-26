@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://wangts.site/"/>
-  <updated>2020-08-25T09:09:35.566Z</updated>
+  <updated>2020-08-26T08:06:11.064Z</updated>
   <id>http://wangts.site/</id>
   
   <author>
@@ -15,6 +15,45 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>Java线程池</title>
+    <link href="http://wangts.site/2020/08/26/Java%E7%BA%BF%E7%A8%8B%E6%B1%A0/"/>
+    <id>http://wangts.site/2020/08/26/Java%E7%BA%BF%E7%A8%8B%E6%B1%A0/</id>
+    <published>2020-08-26T06:33:03.000Z</published>
+    <updated>2020-08-26T08:06:11.064Z</updated>
+    
+    <summary type="html">
+    
+      &lt;p&gt;本文主要涉及到以下内容：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;p&gt;线程池的定义&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Executors创建线程池的几种方式&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;ThreadPoolExecutor对象&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;线程池执行任务逻辑和线程池参数的关系&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;Executors创建返回ThreadPoolExecutor对象&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;OOM异常测试&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;如何定义线程池参数&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;&lt;p&gt;semaphore线程限流&lt;/p&gt;
+    
+    </summary>
+    
+    
+      <category term="Java" scheme="http://wangts.site/categories/Java/"/>
+    
+      <category term="线程" scheme="http://wangts.site/categories/Java/%E7%BA%BF%E7%A8%8B/"/>
+    
+    
+      <category term="线程池" scheme="http://wangts.site/tags/%E7%BA%BF%E7%A8%8B%E6%B1%A0/"/>
+    
+  </entry>
   
   <entry>
     <title>Java8中Stream用法</title>

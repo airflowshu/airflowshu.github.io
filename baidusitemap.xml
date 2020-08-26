@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
+    <loc>http://wangts.site/2020/08/26/Java%E7%BA%BF%E7%A8%8B%E6%B1%A0/</loc>
+    <lastmod>2020-08-26</lastmod>
+  </url>
+  <url>
     <loc>http://wangts.site/2020/08/25/Java8%E4%B8%ADStream%E7%94%A8%E6%B3%95/</loc>
     <lastmod>2020-08-25</lastmod>
   </url>

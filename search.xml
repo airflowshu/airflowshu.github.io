@@ -771,4 +771,124 @@ OK,刚刚我们是添加主节点，我们也可以添加从节点，比如我�
         <tag>Java</tag>
       </tags>
   </entry>
+  <entry>
+    <title>Java线程池</title>
+    <url>/2020/08/26/Java%E7%BA%BF%E7%A8%8B%E6%B1%A0/</url>
+    <content><![CDATA[<p>本文主要涉及到以下内容：</p>
+<ul>
+<li><p>线程池的定义</p>
+</li>
+<li><p>Executors创建线程池的几种方式</p>
+</li>
+<li><p>ThreadPoolExecutor对象</p>
+</li>
+<li><p>线程池执行任务逻辑和线程池参数的关系</p>
+</li>
+<li><p>Executors创建返回ThreadPoolExecutor对象</p>
+</li>
+<li><p>OOM异常测试</p>
+</li>
+<li><p>如何定义线程池参数</p>
+</li>
+<li><p>semaphore线程限流</p>
+<a id="more"></a>
+<h2 id="线程池的定义"><a href="#线程池的定义" class="headerlink" title="线程池的定义"></a>线程池的定义</h2><p>管理一组工作线程。通过线程池复用线程有以下几点优点：</p>
+</li>
+<li><p>减少资源创建 =&gt; 减少内存开销，创建线程占用内存</p>
+</li>
+<li><p>降低系统开销 =&gt; 创建线程需要时间，会延迟处理的请求</p>
+</li>
+<li><p>提高稳定稳定性 =&gt; 避免无限创建线程引起的OutOfMemoryError【简称OOM】</p>
+</li>
+</ul>
+<h2 id="Excutors创建线程池的方式"><a href="#Excutors创建线程池的方式" class="headerlink" title="Excutors创建线程池的方式"></a>Excutors创建线程池的方式</h2><p>根据返回的对象类型创建线程池可以分为三类：</p>
+<ul>
+<li>创建返回ThreadPoolExecutor对象</li>
+<li>创建返回ScheduleThreadPoolExecutor对象</li>
+<li>创建返回ForkJoinPool对象</li>
+</ul>
+<p>本文只讨论创建返回ThreadPoolExecutor对象</p>
+<h2 id="ThreadPoolExcutor对象"><a href="#ThreadPoolExcutor对象" class="headerlink" title="ThreadPoolExcutor对象"></a>ThreadPoolExcutor对象</h2><p>在介绍Executors创建线程池方法前先介绍一下ThreadPoolExecutor，因为这些创建线程池的静态方法都是返回ThreadPoolExecutor对象，和我们手动创建ThreadPoolExecutor对象的区别就是我们不需要自己传构造函数的参数。</p>
+<p>ThreadPoolExecutor的构造函数共有四个，但最终调用的都是同一个：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">ThreadPoolExecutor</span><span class="params">(<span class="keyword">int</span> corePoolSize,</span></span></span><br><span class="line"><span class="function"><span class="params">                          <span class="keyword">int</span> maximumPoolSize,</span></span></span><br><span class="line"><span class="function"><span class="params">                          <span class="keyword">long</span> keepAliveTime,</span></span></span><br><span class="line"><span class="function"><span class="params">                          TimeUnit unit,</span></span></span><br><span class="line"><span class="function"><span class="params">                          BlockingQueue&lt;Runnable&gt; workQueue,</span></span></span><br><span class="line"><span class="function"><span class="params">                          ThreadFactory threadFactory,</span></span></span><br><span class="line"><span class="function"><span class="params">                          RejectedExecutionHandler handler)</span></span></span><br></pre></td></tr></table></figure>
+<p>构造参数说明：</p>
+<ul>
+<li>corePoolSize:核心线程数（一直存在的可用线程数）</li>
+<li>maximumPoolSize:最大可用线程数</li>
+<li>keepAliveTime:闲置线程的保活时间（超过保活时间则被线程池回收）</li>
+<li>unit：保活时间单位</li>
+<li>BolckingQuene:线程池所使用的缓冲队列（当请求线程数超过核心线程数后，在workQuene排队等待可用线程的调用）</li>
+<li>ThreadFactory:线程池创建线程所用的工厂</li>
+<li>RejectedExecutionHandler: 线程池对拒绝任务的处理策略</li>
+</ul>
+<img src="/2020/08/26/Java%E7%BA%BF%E7%A8%8B%E6%B1%A0/1.jpg" class="" title="test1">
+<p>执行逻辑说明：</p>
+<ul>
+<li>判断核心线程数是否已满，核心线程数大小和corePoolSize参数有关，未满则创建线程执行任务</li>
+<li>若核心线程池已满，判断队列是否满，队列是否满和workQueue参数有关，若未满则加入队列中</li>
+<li>若队列已满，判断线程池是否已满，线程池是否已满和maximumPoolSize参数有关，若未满创建线程执行任务</li>
+<li>若线程池已满，则采用拒绝策略处理无法执执行的任务，拒绝策略和handler参数有关</li>
+</ul>
+<h2 id="Executors创建返回ThreadPoolExecutor三种对象"><a href="#Executors创建返回ThreadPoolExecutor三种对象" class="headerlink" title="Executors创建返回ThreadPoolExecutor三种对象"></a>Executors创建返回ThreadPoolExecutor三种对象</h2><p>Executors创建返回ThreadPoolExecutor对象的方法共有三种：</p>
+<ul>
+<li>Executors#newCachedThreadPool =&gt; 创建可缓存的线程池</li>
+<li>Executors#newSingleThreadExecutor =&gt; 创建单线程的线程池</li>
+<li>Executors#newFixedThreadPool =&gt; 创建固定长度的线程池</li>
+</ul>
+<h3 id="newCachedThreadPool方法"><a href="#newCachedThreadPool方法" class="headerlink" title="#newCachedThreadPool方法"></a>#newCachedThreadPool方法</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ExecutorService <span class="title">newCachedThreadPool</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> ThreadPoolExecutor(<span class="number">0</span>, Integer.MAX_VALUE,</span><br><span class="line">                                  <span class="number">60L</span>, TimeUnit.SECONDS,</span><br><span class="line">                                  <span class="keyword">new</span> SynchronousQueue&lt;Runnable&gt;());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当一个任务提交时，corePoolSize为0不创建核心线程，SynchronousQueue是一个不存储元素的队列，可以理解为队里永远是满的，<br>因此最终会创建非核心线程来执行任务。对于非核心线程空闲60s时将被回收。<strong>因为Integer.MAX_VALUE非常大，可以认为是可以无限创建线程的，在资源有限的情况下容易引起OOM异常</strong></p>
+<h3 id="newSingleThreadExecutor方法"><a href="#newSingleThreadExecutor方法" class="headerlink" title="#newSingleThreadExecutor方法"></a>#newSingleThreadExecutor方法</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ExecutorService <span class="title">newSingleThreadExecutor</span><span class="params">()</span> </span>&#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="keyword">new</span> FinalizableDelegatedExecutorService</span><br><span class="line">		(<span class="keyword">new</span> ThreadPoolExecutor(<span class="number">1</span>, <span class="number">1</span>,</span><br><span class="line">								<span class="number">0L</span>, TimeUnit.MILLISECONDS,</span><br><span class="line">								<span class="keyword">new</span> LinkedBlockingQueue&lt;Runnable&gt;()));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当一个任务提交时，首先会创建一个核心线程来执行任务，如果超过核心线程的数量，将会放入队列中，<br><strong>因为LinkedBlockingQueue是长度为Integer.MAX_VALUE的队列，可以认为是无界队列，因此往队列中可以插入无限多的任务，在资源有限的时候容易引起OOM异常，</strong><br>同时因为无界队列，maximumPoolSize和keepAliveTime参数将无效，压根就不会创建非核心线程</p>
+<h3 id="newFixedThreadPool方法"><a href="#newFixedThreadPool方法" class="headerlink" title="#newFixedThreadPool方法"></a>#newFixedThreadPool方法</h3><figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> ExecutorService <span class="title">newFixedThreadPool</span><span class="params">(<span class="keyword">int</span> nThreads)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> ThreadPoolExecutor(nThreads, nThreads,</span><br><span class="line">                                  <span class="number">0L</span>, TimeUnit.MILLISECONDS,</span><br><span class="line">                                  <span class="keyword">new</span> LinkedBlockingQueue&lt;Runnable&gt;());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>FixedThreadPool是固定核心线程的线程池，固定核心线程数由用户传入。<br>LinkedBlockingQueue和SingleThreadExecutor类似，唯一的区别就是核心线程数不同，并且由于使用的是LinkedBlockingQueue，在资源有限的时候容易引起OOM异常</p>
+<p><strong>总结：</strong></p>
+<p>FixedThreadPool和SingleThreadExecutor =&gt; 允许的请求队列长度为Integer.MAX_VALUE，可能会堆积大量的请求，从而引起OOM异常<br>CachedThreadPool =&gt; 允许创建的线程数为Integer.MAX_VALUE，可能会创建大量的线程，从而引起OOM异常</p>
+<p>这就是为什么禁止使用Executors去创建线程池，而是推荐自己去创建ThreadPoolExecutor的原因。</p>
+<h2 id="OOM异常测试"><a href="#OOM异常测试" class="headerlink" title="OOM异常测试"></a>OOM异常测试</h2><p>理论上会出现OOM异常，必须测试一波验证之前的说法：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TaskTest</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        ExecutorService es = Executors.newCachedThreadPool();</span><br><span class="line">        <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">            es.submit(<span class="keyword">new</span> Task(i++));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>使用Executors创建的CachedThreadPool，往线程池中无限添加线程在启动测试类之前先将JVM内存调整小一点，不然很容易将电脑跑出问题【别问我为什么知道，是铁憨憨甜没错了！！！】，在idea里：Run -&gt; Edit Configurations</p>
+<img src="/2020/08/26/Java%E7%BA%BF%E7%A8%8B%E6%B1%A0/2.jpg" class="" title="test2">
+<p>JVM参数说明：</p>
+<ul>
+<li>-Xms10M =&gt; Java Heap内存初始化值</li>
+<li>-Xmx10M =&gt; Java Heap内存最大值</li>
+<li>运行结果：<br>  Exception: java.lang.OutOfMemoryError thrown from the UncaughtExceptionHandler in thread “main”<br>  Disconnected from the target VM, address: ‘127.0.0.1:60416’, transport: ‘socket’</li>
+</ul>
+<p>创建到3w多个线程的时候开始报OOM错误</p>
+<p>另外两个线程池就不做测试了，测试方法一致，只是创建的线程池不一样。</p>
+<h2 id="如何定义线程池参数"><a href="#如何定义线程池参数" class="headerlink" title="如何定义线程池参数"></a>如何定义线程池参数</h2><p><strong>CPU密集型</strong> =&gt; 线程池的大小推荐为CPU数量 + 1，CPU数量可以根据Runtime.availableProcessors方法获取</p>
+<p><strong>IO密集型</strong> =&gt; CPU数量 * CPU利用率 * (1 + 线程等待时间/线程CPU时间)</p>
+<p><strong>混合型</strong> =&gt; 将任务分为CPU密集型和IO密集型，然后分别使用不同的线程池去处理，从而使每个线程池可以根据各自的工作负载来调整</p>
+<p><strong>阻塞队列</strong> =&gt; 推荐使用有界队列，有界队列有助于避免资源耗尽的情况发生</p>
+<p><strong>拒绝策略</strong> =&gt; 默认采用的是AbortPolicy拒绝策略，直接在程序中抛出RejectedExecutionException异常【因为是运行时异常，不强制catch】，这种处理方式不够优雅。处理拒绝策略有以下几种比较推荐：</p>
+<ul>
+<li>在程序中捕获RejectedExecutionException异常，在捕获异常中对任务进行处理。针对默认拒绝策略</li>
+<li>使用CallerRunsPolicy拒绝策略，该策略会将任务交给调用execute的线程执行【一般为主线程】，此时主线程将在一段时间内不能提交任何任务，从而使工作线程处理正在执行的任务。此时提交的线程将被保存在TCP队列中，TCP队列满将会影响客户端，这是一种平缓的性能降低</li>
+<li>自定义拒绝策略，只需要实现RejectedExecutionHandler接口即可</li>
+<li>如果任务不是特别重要，使用DiscardPolicy和DiscardOldestPolicy拒绝策略将任务丢弃也是可以的</li>
+</ul>
+<p>如果使用Executors的静态方法创建ThreadPoolExecutor对象，可以通过使用Semaphore对任务的执行进行限流也可以避免出现OOM异常。</p>
+<h2 id="Semaphore限流"><a href="#Semaphore限流" class="headerlink" title="Semaphore限流"></a>Semaphore限流</h2><p>Semaphore 是一个计数信号量，必须由获取它的线程释放。</p>
+<p>常用于限制可以访问某些资源的线程数量，例如通过 Semaphore 限流。</p>
+<p>Semaphore 只有3个操作：</p>
+<ol>
+<li>初始化</li>
+<li>增加</li>
+<li>减少</li>
+</ol>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">StudySemaphore</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        ExecutorService executorService = Executors.newCachedThreadPool();</span><br><span class="line">        </span><br><span class="line">        <span class="comment">//信号量，只允许 3个线程同时访问</span></span><br><span class="line">        Semaphore semaphore = <span class="keyword">new</span> Semaphore(<span class="number">3</span>);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i=<span class="number">0</span>;i&lt;<span class="number">10</span>;i++)&#123;</span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">long</span> num = i;</span><br><span class="line">            executorService.submit(<span class="keyword">new</span> Runnable() &#123;</span><br><span class="line">                <span class="meta">@Override</span></span><br><span class="line">                <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">                    <span class="keyword">try</span> &#123;</span><br><span class="line">                        <span class="comment">//获取许可</span></span><br><span class="line">                        semaphore.acquire();</span><br><span class="line">                        <span class="comment">//执行</span></span><br><span class="line">                        System.out.println(<span class="string">"Accessing: "</span> + num);</span><br><span class="line">                        Thread.sleep(<span class="keyword">new</span> Random().nextInt(<span class="number">5000</span>)); <span class="comment">// 模拟随机执行时长</span></span><br><span class="line">                        <span class="comment">//释放</span></span><br><span class="line">                        semaphore.release();</span><br><span class="line">                        System.out.println(<span class="string">"Release..."</span> + num);</span><br><span class="line">                    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                        e.printStackTrace();</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;);</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">        executorService.shutdown();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight javascript"><table><tr><td class="code"><pre><span class="line"><span class="string">"C:\Program Files\Java\jdk1.8.0_251\bin\java.exe"</span> </span><br><span class="line">Accessing: <span class="number">0</span></span><br><span class="line">Accessing: <span class="number">2</span></span><br><span class="line">Accessing: <span class="number">1</span></span><br><span class="line">Release..<span class="number">.2</span></span><br><span class="line">Accessing: <span class="number">3</span></span><br><span class="line">Release..<span class="number">.0</span></span><br><span class="line">Accessing: <span class="number">6</span></span><br><span class="line">Release..<span class="number">.1</span></span><br><span class="line">Accessing: <span class="number">5</span></span><br><span class="line">Release..<span class="number">.3</span></span><br><span class="line">Accessing: <span class="number">4</span></span><br><span class="line">Release..<span class="number">.6</span></span><br><span class="line">Accessing: <span class="number">7</span></span><br><span class="line">Release..<span class="number">.7</span></span><br><span class="line">Accessing: <span class="number">8</span></span><br><span class="line">Release..<span class="number">.8</span></span><br><span class="line">Accessing: <span class="number">9</span></span><br><span class="line">Release..<span class="number">.5</span></span><br><span class="line">Release..<span class="number">.4</span></span><br><span class="line">Release..<span class="number">.9</span></span><br><span class="line"></span><br><span class="line">Process finished <span class="keyword">with</span> exit code <span class="number">0</span></span><br></pre></td></tr></table></figure>
+<p>我们点开Semaphore这个类：</p>
+<figure class="highlight java"><table><tr><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * Creates a &#123;<span class="doctag">@code</span> Semaphore&#125; with the given number of</span></span><br><span class="line"><span class="comment"> * permits and nonfair fairness setting.</span></span><br><span class="line"><span class="comment"> *</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@param</span> permits the initial number of permits available.</span></span><br><span class="line"><span class="comment"> *        This value may be negative, in which case releases</span></span><br><span class="line"><span class="comment"> *        must occur before any acquires will be granted.</span></span><br><span class="line"><span class="comment"> */</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="title">Semaphore</span><span class="params">(<span class="keyword">int</span> permits)</span> </span>&#123;</span><br><span class="line">	sync = <span class="keyword">new</span> NonfairSync(permits);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到Semaphore是个非公平锁，线程执行时无序随机的。所以有上述执行结果。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>线程</category>
+      </categories>
+      <tags>
+        <tag>线程池</tag>
+      </tags>
+  </entry>
 </search>
