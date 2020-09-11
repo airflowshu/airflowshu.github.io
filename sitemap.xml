@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>http://wangts.site/2020/09/11/NIO/</loc>
+    
+    <lastmod>2020-09-11</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>http://wangts.site/2020/09/04/IDEA%E8%BF%9C%E7%A8%8B%E8%B0%83%E8%AF%95%E6%95%99%E7%A8%8B%E6%AD%A5%E9%AA%A4/</loc>
     
     <lastmod>2020-09-09</lastmod>
@@ -74,7 +81,7 @@
 
   <url>
     <loc>http://wangts.site/</loc>
-    <lastmod>2020-09-09</lastmod>
+    <lastmod>2020-09-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -82,49 +89,56 @@
   
   <url>
     <loc>http://wangts.site/tags/%E7%BA%BF%E4%B8%8A%E7%94%9F%E4%BA%A7%E8%AE%B0%E5%BD%95/</loc>
-    <lastmod>2020-09-09</lastmod>
+    <lastmod>2020-09-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://wangts.site/tags/%E5%BC%80%E5%8F%91%E6%89%8B%E5%86%8C/</loc>
-    <lastmod>2020-09-09</lastmod>
+    <lastmod>2020-09-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://wangts.site/tags/SpringBoot/</loc>
-    <lastmod>2020-09-09</lastmod>
+    <lastmod>2020-09-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://wangts.site/tags/Java/</loc>
-    <lastmod>2020-09-09</lastmod>
+    <lastmod>2020-09-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://wangts.site/tags/%E7%BA%BF%E7%A8%8B%E6%B1%A0/</loc>
-    <lastmod>2020-09-09</lastmod>
+    <lastmod>2020-09-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://wangts.site/tags/MySQL/</loc>
-    <lastmod>2020-09-09</lastmod>
+    <lastmod>2020-09-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://wangts.site/tags/IDEA/</loc>
-    <lastmod>2020-09-09</lastmod>
+    <lastmod>2020-09-11</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://wangts.site/tags/NIO/</loc>
+    <lastmod>2020-09-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
@@ -133,70 +147,77 @@
   
   <url>
     <loc>http://wangts.site/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/</loc>
-    <lastmod>2020-09-09</lastmod>
+    <lastmod>2020-09-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://wangts.site/categories/SpringBoot/</loc>
-    <lastmod>2020-09-09</lastmod>
+    <lastmod>2020-09-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://wangts.site/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/Redis/</loc>
-    <lastmod>2020-09-09</lastmod>
+    <lastmod>2020-09-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://wangts.site/categories/%E7%BA%BF%E4%B8%8A/</loc>
-    <lastmod>2020-09-09</lastmod>
+    <lastmod>2020-09-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://wangts.site/categories/Java/</loc>
-    <lastmod>2020-09-09</lastmod>
+    <lastmod>2020-09-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://wangts.site/categories/Java/Stream%E7%94%A8%E6%B3%95/</loc>
-    <lastmod>2020-09-09</lastmod>
+    <lastmod>2020-09-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://wangts.site/categories/Java/%E7%BA%BF%E7%A8%8B/</loc>
-    <lastmod>2020-09-09</lastmod>
+    <lastmod>2020-09-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://wangts.site/categories/%E6%95%B0%E6%8D%AE%E5%BA%93/MySQL/</loc>
-    <lastmod>2020-09-09</lastmod>
+    <lastmod>2020-09-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://wangts.site/categories/%E5%B7%A5%E5%85%B7/</loc>
-    <lastmod>2020-09-09</lastmod>
+    <lastmod>2020-09-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
   
   <url>
     <loc>http://wangts.site/categories/%E5%B7%A5%E5%85%B7/IDEA/</loc>
-    <lastmod>2020-09-09</lastmod>
+    <lastmod>2020-09-11</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
+  <url>
+    <loc>http://wangts.site/categories/Java/NIO/</loc>
+    <lastmod>2020-09-11</lastmod>
     <changefreq>daily</changefreq>
     <priority>0.6</priority>
   </url>
