@@ -1119,4 +1119,178 @@ OK,刚刚我们是添加主节点，我们也可以添加从节点，比如我�
         <tag>NIO</tag>
       </tags>
   </entry>
+  <entry>
+    <title>LVM逻辑卷、卷组基本操作</title>
+    <url>/2020/10/13/LVM%E9%80%BB%E8%BE%91%E5%8D%B7%E3%80%81%E5%8D%B7%E7%BB%84%E5%9F%BA%E6%9C%AC%E6%93%8D%E4%BD%9C/</url>
+    <content><![CDATA[<p>LVM逻辑卷、卷组基本操作增删扩缩</p>
+<a id="more"></a>
+<p>LVM逻辑卷管理<br>LVM逻辑卷管理(Logical Volume Manager),是建立在物理存储设备上的一个抽象层，允许生成逻辑存储卷，与直接使用物理存储在管理上相比，提供了更好的灵活性。</p>
+<p>LVM将存储虚拟化，使用逻辑卷，不会受限于物理磁盘的大小，另外，与硬件相关的存储设置被隐藏，可以不用停止应用或卸载文件系统来调整卷大小或数据迁移，这样可以减少操作成本。</p>
+<h1 id="基本概念："><a href="#基本概念：" class="headerlink" title="基本概念："></a>基本概念：</h1><ul>
+<li><p>物理卷–PV(Physical Volume)<br>物理卷在逻辑卷管理中处于最底层，它可以是实际物理磁盘上的分区，也可以是整个物理硬盘。</p>
+</li>
+<li><p>卷组–VG(Volume Group)<br>卷组建立在物理卷之上，一个卷组中至少要包括一个物理卷，在卷组建立之后可动态添加物理卷到卷组中。一个逻辑卷管理系统工程中可以只有一个卷组，也可以拥有多个卷组。</p>
+</li>
+<li><p>逻辑卷–LV(Logical Volume)<br>逻辑卷建立在卷组之上，卷组中的未分配空间可以用于建立新的逻辑卷，逻辑卷建立后可以动态地扩展和缩小空间。系统中的多个逻辑卷可以属于同一个卷组，也可以属于不同的多个卷组。</p>
+</li>
+<li><p>物理区域–PE（Physical Extent）<br>物理区域是物理卷中可用于分配的最小存储单元，物理区域的大小可根据实际情况在建立物理卷时指定。物理区域大小一旦确定将不能更改，同一卷组中的所有物理卷的物理区域大小需要一致。</p>
+</li>
+<li><p>逻辑区域—LE（Logical Extent）<br>逻辑区域是逻辑卷中可用于分配的最小存储单元，逻辑区域的大小取决于逻辑卷所在卷组中的物理区域的大小。</p>
+</li>
+<li><p>卷组描述区域（Volume Group Descriptor Area）<br>卷组描述区域存在于每个物理卷中，用于描述物理卷本身、物理卷所属卷组、卷组中的逻辑卷及逻辑卷中物理区域的分配等所有信息，卷组描述区域是在使用pvcreate建立物理卷时建立的。</p>
+</li>
+</ul>
+<h2 id="创建LVM"><a href="#创建LVM" class="headerlink" title="创建LVM"></a>创建LVM</h2><ol>
+<li><p>将物理磁盘设备初始化为物理卷</p>
+<blockquote>
+<p>pvcreate /dev/sdb /dev/sdc</p>
+</blockquote>
+</li>
+<li><p>创建卷组，并将PV加入卷组中</p>
+<blockquote>
+<p>vgcreat linuxvg /dev/sdb /dev/sdc</p>
+</blockquote>
+</li>
+<li><p>基于卷组创建逻辑卷</p>
+<blockquote>
+<p>lvcreat -n linuxlv -L 2G linuxvg</p>
+</blockquote>
+</li>
+<li><p>为创建好的逻辑卷创建文件系统</p>
+<blockquote>
+<p>mkfs.ext4 /dev/linuxvg/linuxlv</p>
+</blockquote>
+</li>
+<li><p>将格式化好的逻辑卷挂载使用</p>
+<blockquote>
+<p>mount /dev/linuxvg/linuxlv /mnt</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="查看LVM"><a href="#查看LVM" class="headerlink" title="查看LVM"></a>查看LVM</h2><ol>
+<li><p>查看物理卷信息</p>
+<blockquote>
+<p>pvdisplay（详细）<br>pvs</p>
+</blockquote>
+</li>
+<li><p>查看卷组信息</p>
+<blockquote>
+<p>vgdisplay（详细）<br>vgs</p>
+</blockquote>
+</li>
+<li><p>查看逻辑卷信息</p>
+<blockquote>
+<p>lvdisplay（详细）<br>lvs</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="删除逻辑卷"><a href="#删除逻辑卷" class="headerlink" title="删除逻辑卷"></a>删除逻辑卷</h2><ol>
+<li><p>首先删除一个逻辑卷</p>
+<blockquote>
+<p>lvremove /dev/linuxvg/linuxlv</p>
+</blockquote>
+</li>
+<li><p>删除一个卷组</p>
+<blockquote>
+<p>vgremove linuxvg</p>
+</blockquote>
+</li>
+<li><p>删除物理卷</p>
+<blockquote>
+<p>pvremove /dev/sdb</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="LVM-拉伸与缩小"><a href="#LVM-拉伸与缩小" class="headerlink" title="LVM 拉伸与缩小"></a>LVM 拉伸与缩小</h2><ol>
+<li><p>拉伸一个逻辑卷，保证VG有足够的空闲空间</p>
+<blockquote>
+<p>vgdisplay</p>
+</blockquote>
+</li>
+<li><p>扩充逻辑卷</p>
+<blockquote>
+<p>lvextend -L +1G /dev/linuxvg/linuxlv</p>
+</blockquote>
+</li>
+<li><p>查看扩充后LV大小</p>
+<blockquote>
+<p>lvdisplay</p>
+</blockquote>
+</li>
+<li><p>更新文件系统</p>
+<blockquote>
+<p>resize2fs /dev/linuxvg/linuxlv</p>
+</blockquote>
+</li>
+<li><p>查看更新后文件系统</p>
+<blockquote>
+<p>df -h</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="拉伸一个卷组"><a href="#拉伸一个卷组" class="headerlink" title="拉伸一个卷组"></a>拉伸一个卷组</h2><ol>
+<li><p>将要添加到VG的硬盘“格式化”为PV</p>
+<blockquote>
+<p>pvcreate /dev/sdd</p>
+</blockquote>
+</li>
+<li><p>将新的PV添加到指定卷组中</p>
+<blockquote>
+<p>vgextend linuxvg /dev/sdd</p>
+</blockquote>
+</li>
+<li><p>查看扩充后VG大小</p>
+<blockquote>
+<p>vgdisplay</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="缩小一个逻辑卷"><a href="#缩小一个逻辑卷" class="headerlink" title="缩小一个逻辑卷"></a>缩小一个逻辑卷</h2><ol>
+<li><p>卸载已经挂在的逻辑卷</p>
+<blockquote>
+<p>umount /dev/linuxvg/linuxlv</p>
+</blockquote>
+</li>
+<li><p>缩小文件系统（会提示需要运行fsck检查文件系统）</p>
+<blockquote>
+<p>resize2fs /dev/linuxvg/linuxlv 1G(调整大小为1G)</p>
+</blockquote>
+</li>
+<li><p>缩小LV</p>
+<blockquote>
+<p>lvreduce -L 1G /dev/linuxvg/linuxlv</p>
+</blockquote>
+</li>
+<li><p>查看缩小后的LV</p>
+<blockquote>
+<p>lvdisplay</p>
+</blockquote>
+</li>
+<li><p>挂载</p>
+<blockquote>
+<p>mount /dev/linuxvg/linuxlv /mnt</p>
+</blockquote>
+</li>
+</ol>
+<h2 id="缩小卷组"><a href="#缩小卷组" class="headerlink" title="缩小卷组"></a>缩小卷组</h2><ol>
+<li><p>将一个PV从卷组中移除</p>
+<blockquote>
+<p>vgreduce linuxvg /dev/sdc</p>
+</blockquote>
+</li>
+<li><p>查看缩小后的卷组大小</p>
+<blockquote>
+<p>vgdisplay</p>
+</blockquote>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>Linux</category>
+        <category>运维</category>
+      </categories>
+      <tags>
+        <tag>Linux</tag>
+      </tags>
+  </entry>
 </search>
