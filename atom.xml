@@ -6,7 +6,7 @@
   <link href="/atom.xml" rel="self"/>
   
   <link href="http://wangts.site/"/>
-  <updated>2020-11-18T03:07:02.208Z</updated>
+  <updated>2020-12-03T08:35:59.132Z</updated>
   <id>http://wangts.site/</id>
   
   <author>
@@ -15,6 +15,36 @@
   </author>
   
   <generator uri="https://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>CentOS7离线一键安装fastDfs</title>
+    <link href="http://wangts.site/2020/12/03/CentOS7%E7%A6%BB%E7%BA%BF%E4%B8%80%E9%94%AE%E5%AE%89%E8%A3%85fastDfs/"/>
+    <id>http://wangts.site/2020/12/03/CentOS7%E7%A6%BB%E7%BA%BF%E4%B8%80%E9%94%AE%E5%AE%89%E8%A3%85fastDfs/</id>
+    <published>2020-12-03T08:02:02.000Z</published>
+    <updated>2020-12-03T08:35:59.132Z</updated>
+    
+    <summary type="html">
+    
+      &lt;blockquote&gt;
+&lt;p&gt;一键安装所有相关依赖，无需联网，比在线安装更简单！&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;本离线版已配置服务自启动&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;/blockquote&gt;
+    
+    </summary>
+    
+    
+      <category term="Java" scheme="http://wangts.site/categories/Java/"/>
+    
+      <category term="Linux" scheme="http://wangts.site/categories/Linux/"/>
+    
+      <category term="运维" scheme="http://wangts.site/categories/Linux/%E8%BF%90%E7%BB%B4/"/>
+    
+      <category term="fastDFS" scheme="http://wangts.site/categories/Java/fastDFS/"/>
+    
+    
+  </entry>
   
   <entry>
     <title>fastDFS文件存储定时删除历史文件</title>
@@ -99,7 +129,7 @@
     <link href="http://wangts.site/2020/09/04/IDEA%E8%BF%9C%E7%A8%8B%E8%B0%83%E8%AF%95%E6%95%99%E7%A8%8B%E6%AD%A5%E9%AA%A4/"/>
     <id>http://wangts.site/2020/09/04/IDEA%E8%BF%9C%E7%A8%8B%E8%B0%83%E8%AF%95%E6%95%99%E7%A8%8B%E6%AD%A5%E9%AA%A4/</id>
     <published>2020-09-04T08:58:04.000Z</published>
-    <updated>2020-09-09T02:48:57.462Z</updated>
+    <updated>2020-11-26T07:52:29.814Z</updated>
     
     <summary type="html">
     

@@ -951,7 +951,7 @@ OK,刚刚我们是添加主节点，我们也可以添加从节点，比如我�
 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">service  iptables restart</span><br></pre></td></tr></table></figure>
 <p>启动好远程的tomcat项目后，点击debug图标，打上要调试的断电就可以远程debug了。<br><img src="IDEA%E8%BF%9C%E7%A8%8B%E8%B0%83%E8%AF%95%E6%95%99%E7%A8%8B%E6%AD%A5%E9%AA%A4_files/3.jpg" alt=""></p>
 <img src="/2020/09/04/IDEA%E8%BF%9C%E7%A8%8B%E8%B0%83%E8%AF%95%E6%95%99%E7%A8%8B%E6%AD%A5%E9%AA%A4/3.jpg" class="">
-<h1 id="配置SpringBoot的debug模式"><a href="#配置SpringBoot的debug模式" class="headerlink" title="配置SpringBoot的debug模式"></a>配置SpringBoot的debug模式</h1><p>在远程服务上，执行java -jar &lt;粘贴刚刚复制的&gt; app.jar 启动服务即可。<br>然后在IDEA用配置的debug启动，如下图说明成功。</p>
+<h1 id="配置SpringBoot的debug模式"><a href="#配置SpringBoot的debug模式" class="headerlink" title="配置SpringBoot的debug模式"></a>配置SpringBoot的debug模式</h1><p>在远程服务上，执行<font color="red">java -jar <code>粘贴刚刚复制的</code> app.jar </font>启动服务即可。<br>然后在IDEA用配置的debug启动，如下图说明成功。</p>
 <img src="/2020/09/04/IDEA%E8%BF%9C%E7%A8%8B%E8%B0%83%E8%AF%95%E6%95%99%E7%A8%8B%E6%AD%A5%E9%AA%A4/4.jpg" class="">
 ]]></content>
       <categories>
@@ -1322,5 +1322,39 @@ OK,刚刚我们是添加主节点，我们也可以添加从节点，比如我�
       <tags>
         <tag>文件存储服务</tag>
       </tags>
+  </entry>
+  <entry>
+    <title>CentOS7离线一键安装fastDfs</title>
+    <url>/2020/12/03/CentOS7%E7%A6%BB%E7%BA%BF%E4%B8%80%E9%94%AE%E5%AE%89%E8%A3%85fastDfs/</url>
+    <content><![CDATA[<blockquote>
+<p>一键安装所有相关依赖，无需联网，比在线安装更简单！</p>
+<blockquote>
+<p>本离线版已配置服务自启动</p>
+</blockquote>
+</blockquote>
+<a id="more"></a>
+
+<ul>
+<li>fastDfs版本5.11</li>
+<li>默认文件服务存储数据安装在/home下，如需修改，请修改autorun.sh内对应位置</li>
+<li><a href="链接：https://pan.baidu.com/s/1c8J5Yld0FJCYk2qWiTccfw">离线包下载地址</a><br>提取码：wang<br><img src="CentOS7%E7%A6%BB%E7%BA%BF%E4%B8%80%E9%94%AE%E5%AE%89%E8%A3%85fastDfs_files/1.png" alt=""><img src="/2020/12/03/CentOS7%E7%A6%BB%E7%BA%BF%E4%B8%80%E9%94%AE%E5%AE%89%E8%A3%85fastDfs/1.png" class="">
+
+</li>
+</ul>
+<p>操作步骤：</p>
+<ol>
+<li>将解压后的文件夹复制到/opt目录下</li>
+<li>赋予一键执行脚本可执行权限 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">cd &#x2F;opt&#x2F;fastdfs</span><br><span class="line">chmod +x autorun.sh</span><br></pre></td></tr></table></figure></li>
+<li>执行安装 <figure class="highlight plain"><table><tr><td class="code"><pre><span class="line">.&#x2F;autorun.sh</span><br></pre></td></tr></table></figure></li>
+<li>输入本服务器的ip地址，回车。</li>
+</ol>
+<p>观察终端输出，没有报错的话最后会生成测试图片url，复制后在浏览器访问成功即可。</p>
+]]></content>
+      <categories>
+        <category>Java</category>
+        <category>Linux</category>
+        <category>运维</category>
+        <category>fastDFS</category>
+      </categories>
   </entry>
 </search>
